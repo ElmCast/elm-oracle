@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 var Elm = Elm || { Native: {} };
 Elm.Array = Elm.Array || {};
 Elm.Array.make = function (_elm) {
