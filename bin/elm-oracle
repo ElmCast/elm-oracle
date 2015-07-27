@@ -3390,15 +3390,17 @@ Elm.Main.make = function (_elm) {
       },
       string);
    };
-   var Info = F4(function (a,
+   var Info = F5(function (a,
    b,
    c,
-   d) {
+   d,
+   e) {
       return {_: {}
-             ,comment: d
-             ,href: b
+             ,comment: e
+             ,fullName: b
+             ,href: c
              ,name: a
-             ,signature: c};
+             ,signature: d};
    });
    var moduleToDocs = F2(function (modul,
    _v0) {
@@ -3423,7 +3425,8 @@ Elm.Main.make = function (_elm) {
                   var fullName = A2($Basics._op["++"],
                   modul.name,
                   A2($Basics._op["++"],".",name));
-                  var info = A4(Info,
+                  var info = A5(Info,
+                  name,
                   fullName,
                   urlTo(name),
                   vname.signature,
@@ -3465,7 +3468,8 @@ Elm.Main.make = function (_elm) {
                   var fullName = A2($Basics._op["++"],
                   modul.name,
                   A2($Basics._op["++"],".",tag));
-                  var info = A4(Info,
+                  var info = A5(Info,
+                  tag,
                   fullName,
                   urlTo(type$),
                   "",
@@ -3500,28 +3504,21 @@ Elm.Main.make = function (_elm) {
          }();
       }();
    });
-   var collate = F2(function (imports,
-   moduleList) {
+   var collate = F3(function (imports,
+   moduleList,
+   filterName) {
       return function () {
-         var insert = F2(function (_v8,
-         dict) {
+         var accept = function (_v8) {
             return function () {
                switch (_v8.ctor)
                {case "_Tuple2":
-                  return A3($Dict.update,
-                    _v8._0,
-                    function (value) {
-                       return $Maybe.Just(A2($List._op["::"],
-                       _v8._1,
-                       A2($Maybe.withDefault,
-                       _L.fromArray([]),
-                       value)));
-                    },
-                    dict);}
+                  return A2($String.startsWith,
+                    filterName,
+                    _v8._0) ? $Maybe.Just(_v8._1) : $Maybe.Nothing;}
                _U.badCase($moduleName,
-               "on line 60, column 11 to 87");
+               "between lines 58 and 60");
             }();
-         });
+         };
          var getInfo = function (modul) {
             return A2($Maybe.map,
             moduleToDocs(modul),
@@ -3529,9 +3526,7 @@ Elm.Main.make = function (_elm) {
             modul.name,
             imports));
          };
-         return A2($List.foldl,
-         insert,
-         $Dict.empty)($List.concat(A2($List.filterMap,
+         return $List.filterMap(accept)($List.concat(A2($List.filterMap,
          getInfo,
          moduleList)));
       }();
@@ -3540,6 +3535,9 @@ Elm.Main.make = function (_elm) {
       return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
                                                ,_0: "name"
                                                ,_1: $Json$Encode.string(info.name)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "fullName"
+                                               ,_1: $Json$Encode.string(info.fullName)}
                                               ,{ctor: "_Tuple2"
                                                ,_0: "href"
                                                ,_1: $Json$Encode.string(info.href)}
@@ -3577,12 +3575,10 @@ Elm.Main.make = function (_elm) {
    var process = function () {
       var packages = $Package.parse(docs);
       var imports = $Import.parse(code);
-      var data = A2(collate,
+      var infos = A3(collate,
       imports,
-      packages);
-      var infos = A2($Maybe.withDefault,
-      _L.fromArray([]),
-      A2($Dict.get,token,data));
+      packages,
+      token);
       return $Json$Encode.encode(0)($Json$Encode.list(A2($List.map,
       encodeInfo,
       infos)));

@@ -23,8 +23,7 @@ port response = process
 process =
     let imports = Import.parse code
         packages = Package.parse docs
-        data = collate imports packages
-        infos = Maybe.withDefault [] (Dict.get token data)
+        infos = collate imports packages token
     in
         List.map encodeInfo infos
             |> Json.Encode.list
@@ -34,34 +33,35 @@ process =
 encodeInfo info =
     Json.Encode.object
         [ ("name", Json.Encode.string (info.name))
+        , ("fullName", Json.Encode.string (info.fullName))
         , ("href", Json.Encode.string (info.href))
         , ("signature", Json.Encode.string (info.signature))
         , ("comment", Json.Encode.string (info.comment))
         ]
 
 
-type alias Docs = Dict.Dict String (List Info)
-
-
 type alias Info =
     { name : String
+    , fullName: String
     , href : String
     , signature : String
     , comment : String
     }
 
 
-collate : Dict.Dict String Import.Import -> Package.Package -> Docs
-collate imports moduleList =
+collate : Dict.Dict String Import.Import -> Package.Package -> String -> List Info
+collate imports moduleList filterName =
   let getInfo modul =
           Maybe.map (moduleToDocs modul) (Dict.get modul.name imports)
 
-      insert (token, info) dict =
-          Dict.update token (\value -> Just (info :: Maybe.withDefault [] value)) dict
+      accept (token, info) =
+          if String.startsWith filterName token
+          then Just info
+          else Nothing
   in
       List.filterMap getInfo moduleList
         |> List.concat
-        |> List.foldl insert Dict.empty
+        |> List.filterMap accept
 
 
 moduleToDocs : Package.Module -> Import.Import -> List (String, Info)
@@ -74,7 +74,7 @@ moduleToDocs modul { alias, exposed } =
       nameToPair vname =
         let name = vname.name
             fullName = modul.name ++ "." ++ name
-            info = Info fullName (urlTo name) vname.signature vname.comment
+            info = Info name fullName (urlTo name) vname.signature vname.comment
             localName = Maybe.withDefault modul.name alias ++ "." ++ name
             pairs = [(localName, info)]
         in
@@ -90,7 +90,7 @@ moduleToDocs modul { alias, exposed } =
 
       typeToPair type' tag =
         let fullName = modul.name ++ "." ++ tag
-            info = Info fullName (urlTo type') "" ""
+            info = Info tag fullName (urlTo type') "" ""
         in
             [ (tag, info)
             , (fullName, info)
