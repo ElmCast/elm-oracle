@@ -1,13 +1,13 @@
 {
   "name": "elm-oracle",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Query for information about values in elm source files.",
   "engines": {
     "node": ">=0.12.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-		"local-deploy": "./make-bin; npm -g install"
+    "local-deploy": "./make-bin; npm -g install"
   },
   "repository": {
     "type": "git",
