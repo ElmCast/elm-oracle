@@ -1,5 +1,5 @@
 {
-    "version": "0.2.0",
+    "version": "0.1.0",
     "summary": "Query for information about values in elm source files.",
     "repository": "https://github.com/ElmCast/elm-oracle.git",
     "license": "BSD3",
