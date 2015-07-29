@@ -2710,12 +2710,14 @@ Elm.Import.make = function (_elm) {
    $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
-   var pattern = $Regex.regex("(?:^|\\n)import\\s([\\w\\.]+)(?:\\sas\\s(\\w+))?(?:\\sexposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)))\\s*\\))?");
    var search = function (file) {
-      return A3($Regex.find,
-      $Regex.All,
-      pattern,
-      file);
+      return function () {
+         var pattern = $Regex.regex("(?:^|\\n)import\\s([\\w\\.]+)(?:\\sas\\s(\\w+))?(?:\\sexposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)))\\s*\\))?");
+         return A3($Regex.find,
+         $Regex.All,
+         pattern,
+         file);
+      }();
    };
    var exposes = function (s) {
       return _U.eq(s,
@@ -3382,13 +3384,22 @@ Elm.Main.make = function (_elm) {
    $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
-   var dotToHyphen = function (string) {
-      return A2($String.map,
-      function (c) {
-         return _U.eq(c,
-         _U.chr(".")) ? _U.chr("-") : c;
-      },
-      string);
+   var encodeInfo = function (info) {
+      return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
+                                               ,_0: "name"
+                                               ,_1: $Json$Encode.string(info.name)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "fullName"
+                                               ,_1: $Json$Encode.string(info.fullName)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "href"
+                                               ,_1: $Json$Encode.string(info.href)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "signature"
+                                               ,_1: $Json$Encode.string(info.signature)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "comment"
+                                               ,_1: $Json$Encode.string(info.comment)}]));
    };
    var Info = F5(function (a,
    b,
@@ -3406,6 +3417,14 @@ Elm.Main.make = function (_elm) {
    _v0) {
       return function () {
          return function () {
+            var dotToHyphen = function (string) {
+               return A2($String.map,
+               function (c) {
+                  return _U.eq(c,
+                  _U.chr(".")) ? _U.chr("-") : c;
+               },
+               string);
+            };
             var urlTo = function (name) {
                return A2($Basics._op["++"],
                "http://package.elm-lang.org/packages/",
@@ -3458,7 +3477,7 @@ Elm.Main.make = function (_elm) {
                           ,_1: info},
                           pairs) : pairs;}
                      _U.badCase($moduleName,
-                     "between lines 81 and 91");
+                     "between lines 81 and 89");
                   }();
                }();
             };
@@ -3497,7 +3516,7 @@ Elm.Main.make = function (_elm) {
                        typeToPair(_v4._0),
                        _v4._1);}
                   _U.badCase($moduleName,
-                  "on line 100, column 44 to 82");
+                  "on line 98, column 46 to 84");
                }();
             },
             modul.values.types));
@@ -3516,7 +3535,7 @@ Elm.Main.make = function (_elm) {
                     filterName,
                     _v8._0) ? $Maybe.Just(_v8._1) : $Maybe.Nothing;}
                _U.badCase($moduleName,
-               "between lines 58 and 60");
+               "between lines 56 and 58");
             }();
          };
          var getInfo = function (modul) {
@@ -3531,29 +3550,6 @@ Elm.Main.make = function (_elm) {
          moduleList)));
       }();
    });
-   var encodeInfo = function (info) {
-      return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
-                                               ,_0: "name"
-                                               ,_1: $Json$Encode.string(info.name)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "fullName"
-                                               ,_1: $Json$Encode.string(info.fullName)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "href"
-                                               ,_1: $Json$Encode.string(info.href)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "signature"
-                                               ,_1: $Json$Encode.string(info.signature)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "comment"
-                                               ,_1: $Json$Encode.string(info.comment)}]));
-   };
-   var token = Elm.Native.Port.make(_elm).inbound("token",
-   "String",
-   function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
-      v);
-   });
    var docs = Elm.Native.Port.make(_elm).inbound("docs",
    "List (String, String)",
    function (v) {
@@ -3566,35 +3562,33 @@ Elm.Main.make = function (_elm) {
          v);
       })) : _U.badPort("an array",v);
    });
+   var query = Elm.Native.Port.make(_elm).inbound("query",
+   "String",
+   function (v) {
+      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
+      v);
+   });
    var code = Elm.Native.Port.make(_elm).inbound("code",
    "String",
    function (v) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
       v);
    });
-   var process = function () {
-      var packages = $Package.parse(docs);
-      var imports = $Import.parse(code);
-      var infos = A3(collate,
-      imports,
-      packages,
-      token);
-      return $Json$Encode.encode(0)($Json$Encode.list(A2($List.map,
-      encodeInfo,
-      infos)));
-   }();
    var response = Elm.Native.Port.make(_elm).outbound("response",
    function (v) {
       return v;
    },
-   process);
+   function () {
+      var infos = A3(collate,
+      $Import.parse(code),
+      $Package.parse(docs),
+      query);
+      return $Json$Encode.encode(0)($Json$Encode.list(A2($List.map,
+      encodeInfo,
+      infos)));
+   }());
    _elm.Main.values = {_op: _op
-                      ,process: process
-                      ,encodeInfo: encodeInfo
-                      ,Info: Info
-                      ,collate: collate
-                      ,moduleToDocs: moduleToDocs
-                      ,dotToHyphen: dotToHyphen};
+                      ,Info: Info};
    return _elm.Main.values;
 };
 Elm.Maybe = Elm.Maybe || {};
@@ -7032,7 +7026,7 @@ Elm.Native.List.make = function(localRuntime) {
 		when.all(pullDocs(packages)).done(function() {
 			var worker = Elm.worker(Elm.Main, {
 				code: readFile(args[0]),
-				token: args[1],
+				query: args[1],
 				docs: loadDocs(packages),
 			});
 
@@ -10088,8 +10082,7 @@ Elm.Package.make = function (_elm) {
    };
    _elm.Package.values = {_op: _op
                          ,parse: parse
-                         ,Module: Module
-                         ,Vs: Vs};
+                         ,Module: Module};
    return _elm.Package.values;
 };
 Elm.Regex = Elm.Regex || {};

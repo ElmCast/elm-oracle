@@ -21,7 +21,7 @@
 		when.all(pullDocs(packages)).done(function() {
 			var worker = Elm.worker(Elm.Main, {
 				code: readFile(args[0]),
-				token: args[1],
+				query: args[1],
 				docs: loadDocs(packages),
 			});
 

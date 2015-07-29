@@ -1,4 +1,4 @@
-module Package (parse, Package, Module, Vs) where
+module Package (parse, Package, Module) where
 
 import Json.Decode as Json exposing ((:=))
 import List
@@ -30,6 +30,7 @@ type alias Values =
     , types : List (String, List String)
     , values : List Vs
     }
+
 
 type alias Vs =
     { name : String
