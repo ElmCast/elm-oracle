@@ -32,6 +32,6 @@ The return value will be a json array of json objects with information for each 
 ]
 ```
 
-Where as `elm-oracle Main.elm Signal.m` might include Signal.mailbox, Signal.map, etc.
+Whereas `elm-oracle Main.elm Signal.m` might include Signal.mailbox, Signal.map, etc.
 
-This information is used in [elm-vim](http://github.com/elmcast/elm-vim) to show the type, docs, and completions of tokens in the source file.
+This information is used in [elm-vim](http://github.com/elmcast/elm-vim) and [elm-mode](https://github.com/jcollard/elm-mode) to show the types, docs, and completions of tokens in source files.
