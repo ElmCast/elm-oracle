@@ -25,7 +25,3 @@ The return value will be a json array of json objects with information for each 
 Where as `elm-oracle Main.elm Signal.m` might include Signal.mailbox, Signal.map, etc.
 
 This information is used in [elm-vim](http://github.com/elmcast/elm-vim) to show the type, docs, and completions of tokens in the source file.
-
-## Development
-
-You can make any changes to the source and run `npm run-script local-deploy` which will compile, make the binary, and globally install elm-oracle. You can read the contents of 'make-bin' first to verify that it isn't going to set your laptop on fire.
