@@ -12,14 +12,24 @@ npm install -g elm-oracle
 
 ## Usage
 
-elm-oracle <source_file> <string_query>
+```
+$ elm-oracle FILE query
+```
 
 The return value will be a json array of json objects with information for each value that starts with the query string.
 
 `elm-oracle Main.elm Signal.message` might return:
 
 ```json
-[{"name":"message","fullName":"Signal.message","href":"http://package.elm-lang.org/packages/elm-lang/core/latest/Signal#message","signature":"Address a -> a -> Message","comment":"Create a message that may be sent to a `Mailbox` at a later time.\n\nMost importantly, this lets us create APIs that can send values to ports\n*without* allowing people to run arbitrary tasks."}]
+[
+    {
+        "name": "message",
+        "fullName": "Signal.message",
+        "href": "http://package.elm-lang.org/packages/elm-lang/core/latest/Signal#message",
+        "signature": "Address a -> a -> Message",
+        "comment": "Create a message that may be sent to a `Mailbox` at a later time.\n\nMost importantly, this lets us create APIs that can send values to ports\n*without* allowing people to run arbitrary tasks."
+    }
+]
 ```
 
 Where as `elm-oracle Main.elm Signal.m` might include Signal.mailbox, Signal.map, etc.
