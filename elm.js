@@ -3494,8 +3494,7 @@ Elm.Main.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
-   _op["!>"] = $Task.onError;
-   _op["&>"] = $Task.andThen;
+   var tryThen = $Basics.flip($Task.onError);
    var loadDocs = function () {
       var load = function (path) {
          return $Task.mapError(function (_v0) {
@@ -3504,7 +3503,7 @@ Elm.Main.make = function (_elm) {
                "Could not load docs from ",
                path);
             }();
-         })(A2(_op["&>"],
+         })(A2($Task.andThen,
          $File.read(path),
          function ($) {
             return $Task.succeed(F2(function (v0,
@@ -3551,15 +3550,15 @@ Elm.Main.make = function (_elm) {
          })($File.lstat(path));
       };
       var download = function (path) {
-         return A2(_op["&>"],
+         return A2($Task.andThen,
          test(path.local),
          function (_v8) {
             return function () {
-               return A2(_op["!>"],
+               return A2($Task.onError,
                $Task.succeed({ctor: "_Tuple0"}),
                function (_v10) {
                   return function () {
-                     return A2(_op["&>"],
+                     return A2($Task.andThen,
                      pull(path.network),
                      write(path.local));
                   }();
@@ -3578,10 +3577,8 @@ Elm.Main.make = function (_elm) {
       var errorMessage = function (err) {
          return "Dependencies file is missing. Perhaps you need to run `elm-package install`?";
       };
-      return function ($) {
-         return $Task.mapError(errorMessage)($File.read($));
-      }($Path.resolve(_L.fromArray(["elm-stuff"
-                                   ,"exact-dependencies.json"])));
+      return $Task.mapError(errorMessage)($File.read($Path.resolve(_L.fromArray(["elm-stuff"
+                                                                                ,"exact-dependencies.json"]))));
    }();
    var loadSource = function (path) {
       return function () {
@@ -3590,9 +3587,7 @@ Elm.Main.make = function (_elm) {
             "Could not find the given source file: ",
             path);
          };
-         return function ($) {
-            return $Task.mapError(errorMessage)($File.read($));
-         }($Path.normalize(path));
+         return $Task.mapError(errorMessage)($File.read($Path.normalize(path)));
       }();
    };
    var Search = F2(function (a,b) {
@@ -3623,35 +3618,33 @@ Elm.Main.make = function (_elm) {
       {case "Help":
          return $Console.log(usage);
          case "Search":
-         return A2(_op["&>"],
+         return tryThen($Console.fatal)(A2($Task.andThen,
            loadSource(parsedArgs._0),
            function (source) {
-              return A2(_op["&>"],
-              A2(_op["&>"],
+              return A2($Task.andThen,
+              A2($Task.andThen,
               loadDeps,
               function ($) {
                  return $Task.fromResult(parseDeps($));
               }),
               function (docPaths) {
-                 return A2(_op["&>"],
+                 return A2($Task.andThen,
                  downloadDocs(docPaths),
                  function (_v20) {
                     return function () {
-                       return A2(_op["!>"],
-                       A2(_op["&>"],
-                       A2(_op["&>"],
+                       return A2($Task.andThen,
+                       A2($Task.andThen,
                        loadDocs(docPaths),
                        function ($) {
                           return $Task.succeed(A2($Oracle.search,
                           parsedArgs._1,
                           source)($));
                        }),
-                       $Console.log),
-                       $Console.fatal);
+                       $Console.log);
                     }();
                  });
               });
-           });}
+           }));}
       _U.badCase($moduleName,
       "between lines 15 and 27");
    }());
@@ -3664,7 +3657,8 @@ Elm.Main.make = function (_elm) {
                       ,loadDeps: loadDeps
                       ,parseDeps: parseDeps
                       ,downloadDocs: downloadDocs
-                      ,loadDocs: loadDocs};
+                      ,loadDocs: loadDocs
+                      ,tryThen: tryThen};
    return _elm.Main.values;
 };
 Elm.Maybe = Elm.Maybe || {};

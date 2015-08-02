@@ -1,6 +1,6 @@
 module Main where
 
-import Task exposing (Task)
+import Task exposing (Task, andThen, onError)
 
 import Console
 import File
@@ -17,14 +17,14 @@ port main =
       Console.log usage
 
     Search sourceFile query ->
-      loadSource sourceFile
-        &> \source -> loadDeps
-        &> Task.fromResult << parseDeps
-        &> \docPaths -> downloadDocs docPaths
-        &> \_ -> loadDocs docPaths
-        &> Task.succeed << Oracle.search query source
-        &> Console.log
-        !> Console.fatal
+      tryThen Console.fatal <|
+        loadSource sourceFile
+          `andThen` \source -> loadDeps
+          `andThen` (Task.fromResult << parseDeps)
+          `andThen` \docPaths -> downloadDocs docPaths
+          `andThen` \_ -> loadDocs docPaths
+          `andThen` (Task.succeed << Oracle.search query source)
+          `andThen` Console.log
 
 
 usage : String
@@ -55,7 +55,8 @@ loadSource path =
         "Could not find the given source file: " ++ path
   in
       Path.normalize path
-        |> File.read >> Task.mapError errorMessage
+        |> File.read
+        |> Task.mapError errorMessage
 
 
 loadDeps : Task String String
@@ -64,7 +65,8 @@ loadDeps =
         "Dependencies file is missing. Perhaps you need to run `elm-package install`?"
   in
       Path.resolve ["elm-stuff", "exact-dependencies.json"]
-        |> File.read >> Task.mapError errorMessage
+        |> File.read
+        |> Task.mapError errorMessage
 
 
 type alias DocPaths = List { local : String, network : String }
@@ -91,9 +93,9 @@ downloadDocs =
 
       download path =
         test path.local
-          &> \_ -> Task.succeed ()
-          !> \_ -> pull path.network
-            &> write path.local
+          `andThen` \_ -> Task.succeed ()
+          `onError` \_ -> pull path.network
+            `andThen` write path.local
 
   in
       Task.sequence << List.map download
@@ -103,19 +105,11 @@ loadDocs : DocPaths -> Task String (List (String, String))
 loadDocs =
   let load path =
         File.read path
-          &> Task.succeed << (,) path
-          |> Task.mapError (\_ -> "Could not load docs from " ++ path)
+          `andThen` (Task.succeed << (,) path)
+            |> Task.mapError (\_ -> "Could not load docs from " ++ path)
   in
       Task.sequence << List.map (.local >> load)
 
 
-(&>) : Task x a -> (a -> Task x b) -> Task x b
-(&>) = Task.andThen
-
-
-(!>) : Task x a -> (x -> Task y a) -> Task y a
-(!>) = Task.onError
-
-
-infixl 0 &>
-infixl 0 !>
+tryThen : (x -> Task y a) -> Task x a -> Task y a
+tryThen = flip Task.onError
