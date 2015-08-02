@@ -1,15 +1,16 @@
 module Main where
 
-import Task exposing (Task, andThen, onError)
+import Task exposing (Task)
 
 import Console
 import File
+import Http
 import Path
 import Process
 
 import Oracle
 
-port main : Task x ()
+port main : Task String ()
 port main =
   case parsedArgs of
     Help ->
@@ -19,10 +20,9 @@ port main =
       loadSource sourceFile
         &> \source -> loadDeps
         &> Task.fromResult << parseDeps
-        &> \docPaths -> filterExisting docPaths
-        &> downloadDocs
+        &> \docPaths -> downloadDocs docPaths
         &> \_ -> loadDocs docPaths
-        &> Oracle.search query source
+        &> Task.succeed << Oracle.search query source
         &> Console.log
         !> Console.fatal
 
@@ -49,54 +49,64 @@ parsedArgs =
     _ -> Help
 
 
---File.read (Path.resolve ["elm-stuff", "exact-dependencies.json"])
-
-loadSource : String -> Task File.Error String
+loadSource : String -> Task String String
 loadSource path =
-  Path.normalize path |> File.read
+  let errorMessage err =
+        "Could not find the given source file: " ++ path
+  in
+      Path.normalize path
+        |> File.read >> Task.mapError errorMessage
 
 
-loadDeps : Task File.Error String
+loadDeps : Task String String
 loadDeps =
-  Path.resolve ["elm-stuff", "exact-dependencies.json"] |> File.read
+  let errorMessage err =
+        "Dependencies file is missing. Perhaps you need to run `elm-package install`?"
+  in
+      Path.resolve ["elm-stuff", "exact-dependencies.json"]
+        |> File.read >> Task.mapError errorMessage
 
 
 type alias DocPaths = List { local : String, network : String }
 
 
 parseDeps : String -> Result String DocPaths
-parseDeps =
-  []
+parseDeps data =
+  Ok []
 
 
-filterExisting : DocPaths -> Task File.Error DocPaths
-filterExisting =
-  taskFilter << List.map (File.lstat << .local)
-
-
-downloadDocs : DocPaths -> Task File.Error ()
+downloadDocs : DocPaths -> Task String (List ())
 downloadDocs =
-  Task.sequence << List.map (\path -> Http.get path.network &> File.write path.local)
+  let test path =
+        File.lstat path
+          |> Task.mapError (\_ -> "")
 
+      pull path =
+        Http.get path
+          |> Task.mapError (\_ -> "Could not download docs from " ++ path)
 
-loadDocs : DocPaths -> Task File.Error (List String)
-loadDocs =
-  Task.sequence << List.map (File.read << .local)
+      write path data =
+        File.write path data
+          |> Task.mapError (\_ -> "Could not download docs to " ++ path)
 
+      download path =
+        test path.local
+          &> \_ -> Task.succeed ()
+          !> \_ -> pull path.network
+            &> write path.local
 
-taskFilter : List (Task x a) -> Task x (List a)
-taskFilter promises =
-  let maybeCons f mx xs =
-        case f mx of
-          Just x -> x :: xs
-          Nothing -> xs
   in
-      case promises of
-        [] ->
-          Task.succeed []
+      Task.sequence << List.map download
 
-        promise :: remainingTasks ->
-          Task.map2 maybeCons (Task.toMaybe promise) (taskFilter remainingTasks)
+
+loadDocs : DocPaths -> Task String (List (String, String))
+loadDocs =
+  let load path =
+        File.read path
+          &> Task.succeed << (,) path
+          |> Task.mapError (\_ -> "Could not load docs from " ++ path)
+  in
+      Task.sequence << List.map (.local >> load)
 
 
 (&>) : Task x a -> (a -> Task x b) -> Task x b
