@@ -1,6 +1,5 @@
 module Main where
 
-import Json.Encode
 import Task exposing (Task, andThen, onError)
 
 import Console
@@ -17,18 +16,15 @@ port main =
       Console.log usage
 
     Search sourceFile query ->
-      File.read sourceFile
-        `andThen` \source -> File.read (Path.resolve ["elm-stuff", "exact-dependencies.json"])
-        `andThen` Task.fromResult decodeDeps
-        `andThen` \(docPaths, docUrls) -> filterExisting docPaths docUrls
-        `andThen` downloadDocs
-        `andThen` \_ -> loadDocs docPaths
-        `andThen` Task.fromResult decodeDocs
-        `andThen` Oracle.search query source
-        `andThen` Task.fromResult encodeInfo
-        `andThen` Console.log
-          `onError` interpretError
-            `andThen` Console.fatal
+      loadSource sourceFile
+        &> \source -> loadDeps
+        &> Task.fromResult << parseDeps
+        &> \docPaths -> filterExisting docPaths
+        &> downloadDocs
+        &> \_ -> loadDocs docPaths
+        &> Oracle.search query source
+        &> Console.log
+        !> Console.fatal
 
 
 usage : String
@@ -53,12 +49,63 @@ parsedArgs =
     _ -> Help
 
 
-encodeInfo : Oracle.Info -> Json.Encode.Value
-encodeInfo info =
-  Json.Encode.object
-    [ ("name", Json.Encode.string (info.name))
-    , ("fullName", Json.Encode.string (info.fullName))
-    , ("href", Json.Encode.string (info.href))
-    , ("signature", Json.Encode.string (info.signature))
-    , ("comment", Json.Encode.string (info.comment))
-    ]
+--File.read (Path.resolve ["elm-stuff", "exact-dependencies.json"])
+
+loadSource : String -> Task File.Error String
+loadSource path =
+  Path.normalize path |> File.read
+
+
+loadDeps : Task File.Error String
+loadDeps =
+  Path.resolve ["elm-stuff", "exact-dependencies.json"] |> File.read
+
+
+type alias DocPaths = List { local : String, network : String }
+
+
+parseDeps : String -> Result String DocPaths
+parseDeps =
+  []
+
+
+filterExisting : DocPaths -> Task File.Error DocPaths
+filterExisting =
+  taskFilter << List.map (File.lstat << .local)
+
+
+downloadDocs : DocPaths -> Task File.Error ()
+downloadDocs =
+  Task.sequence << List.map (\path -> Http.get path.network &> File.write path.local)
+
+
+loadDocs : DocPaths -> Task File.Error (List String)
+loadDocs =
+  Task.sequence << List.map (File.read << .local)
+
+
+taskFilter : List (Task x a) -> Task x (List a)
+taskFilter promises =
+  let maybeCons f mx xs =
+        case f mx of
+          Just x -> x :: xs
+          Nothing -> xs
+  in
+      case promises of
+        [] ->
+          Task.succeed []
+
+        promise :: remainingTasks ->
+          Task.map2 maybeCons (Task.toMaybe promise) (taskFilter remainingTasks)
+
+
+(&>) : Task x a -> (a -> Task x b) -> Task x b
+(&>) = Task.andThen
+
+
+(!>) : Task x a -> (x -> Task y a) -> Task y a
+(!>) = Task.onError
+
+
+infixl 0 &>
+infixl 0 !>

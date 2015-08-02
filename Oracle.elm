@@ -1,8 +1,20 @@
 module Oracle where
 
-search : String -> String -> String -> List Info
+import Json.Encode
+import String
+import Set
+import Dict
+
+import Import
+import Package
+
+search : String -> String -> List (String, String) -> String
 search query source docs =
-  collate (Import.parse source) (Package.parse docs) query
+  let infos = collate (Import.parse source) (Package.parse docs) query
+  in
+      List.map encodeInfo infos
+        |> Json.Encode.list
+        |> Json.Encode.encode 0
 
 
 type alias Info =
@@ -12,6 +24,17 @@ type alias Info =
   , signature : String
   , comment : String
   }
+
+
+encodeInfo : Info -> Json.Encode.Value
+encodeInfo info =
+  Json.Encode.object
+    [ ("name", Json.Encode.string (info.name))
+    , ("fullName", Json.Encode.string (info.fullName))
+    , ("href", Json.Encode.string (info.href))
+    , ("signature", Json.Encode.string (info.signature))
+    , ("comment", Json.Encode.string (info.comment))
+    ]
 
 
 collate : Dict.Dict String Import.Import -> Package.Package -> String -> List Info
