@@ -1,98 +1,64 @@
-module Main (Info) where
+module Main where
 
-import Dict
-import Maybe
-import Set
-import String
 import Json.Encode
+import Task exposing (Task, andThen, onError)
 
-import Import
-import Package
-import Native.Main
+import Console
+import File
+import Path
+import Process
+
+import Oracle
+
+port main : Task x ()
+port main =
+  case parsedArgs of
+    Help ->
+      Console.log usage
+
+    Search sourceFile query ->
+      File.read sourceFile
+        `andThen` \source -> File.read (Path.resolve ["elm-stuff", "exact-dependencies.json"])
+        `andThen` Task.fromResult decodeDeps
+        `andThen` \(docPaths, docUrls) -> filterExisting docPaths docUrls
+        `andThen` downloadDocs
+        `andThen` \_ -> loadDocs docPaths
+        `andThen` Task.fromResult decodeDocs
+        `andThen` Oracle.search query source
+        `andThen` Task.fromResult encodeInfo
+        `andThen` Console.log
+          `onError` interpretError
+            `andThen` Console.fatal
 
 
--- Inputs
-port code : String
-port query : String
-port docs : List (String, String)
+usage : String
+usage = """elm-oracle 1.0.0
+
+Usage: elm-oracle FILE query
+  Query for information about a token in an Elm file.
+  
+Available options:
+  -h,--help                    Show this help text."""
 
 
--- Main
-port response : String
-port response =
-    let infos = collate (Import.parse code) (Package.parse docs) query
-    in
-        List.map encodeInfo infos
-            |> Json.Encode.list
-            |> Json.Encode.encode 0
+type Command = Help | Search String String
 
 
-type alias Info =
-    { name : String
-    , fullName: String
-    , href : String
-    , signature : String
-    , comment : String
-    }
+parsedArgs : Command
+parsedArgs =
+  case Process.args of
+    "-h" :: xs -> Help
+    "--help" :: xs -> Help
+    x :: y :: [] -> Search x y
+    _ -> Help
 
 
-encodeInfo : Info -> Json.Encode.Value
+encodeInfo : Oracle.Info -> Json.Encode.Value
 encodeInfo info =
-    Json.Encode.object
-        [ ("name", Json.Encode.string (info.name))
-        , ("fullName", Json.Encode.string (info.fullName))
-        , ("href", Json.Encode.string (info.href))
-        , ("signature", Json.Encode.string (info.signature))
-        , ("comment", Json.Encode.string (info.comment))
-        ]
-
-
-collate : Dict.Dict String Import.Import -> Package.Package -> String -> List Info
-collate imports moduleList filterName =
-  let getInfo modul =
-          Maybe.map (moduleToDocs modul) (Dict.get modul.name imports)
-
-      accept (token, info) =
-          if String.startsWith filterName token
-          then Just info
-          else Nothing
-  in
-      List.filterMap getInfo moduleList
-        |> List.concat
-        |> List.filterMap accept
-
-
-moduleToDocs : Package.Module -> Import.Import -> List (String, Info)
-moduleToDocs modul { alias, exposed } =
-    let dotToHyphen string =
-            String.map (\c -> if c == '.' then '-' else c) string
-
-        urlTo name =
-            "http://package.elm-lang.org/packages/"
-            ++ modul.packageName ++ "/latest/" ++ dotToHyphen modul.name ++ "#" ++ name
-
-        nameToPair vname =
-            let name = vname.name
-                fullName = modul.name ++ "." ++ name
-                info = Info name fullName (urlTo name) vname.signature vname.comment
-                localName = Maybe.withDefault modul.name alias ++ "." ++ name
-                pairs = [(localName, info)]
-            in
-                case exposed of
-                    Import.None ->
-                        pairs
-                    Import.Some set ->
-                        if Set.member name set then (name, info) :: pairs else pairs
-                    Import.Every ->
-                        (name, info) :: pairs
-
-        typeToPair type' tag =
-            let fullName = modul.name ++ "." ++ tag
-                info = Info tag fullName (urlTo type') "" ""
-            in
-                [ (tag, info)
-                , (fullName, info)
-                ]
-    in
-        List.concatMap nameToPair (modul.values.aliases ++ modul.values.values)
-        ++ List.concatMap (\(type', tags) -> List.concatMap (typeToPair type') tags) modul.values.types
+  Json.Encode.object
+    [ ("name", Json.Encode.string (info.name))
+    , ("fullName", Json.Encode.string (info.fullName))
+    , ("href", Json.Encode.string (info.href))
+    , ("signature", Json.Encode.string (info.signature))
+    , ("comment", Json.Encode.string (info.comment))
+    ]
