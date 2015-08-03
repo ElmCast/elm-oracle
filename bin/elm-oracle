@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-var path = require('path');
-var spawn = require('child_process').spawn;
-var args = [path.resolve(__dirname, '..', 'elm.js')].concat(process.argv.slice(2));
+var Elm = require('../elm.js');
 
-spawn("node", args, {stdio: 'inherit'}).on('exit', process.exit);
+Elm.worker(Elm.Main);

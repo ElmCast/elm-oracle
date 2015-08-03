@@ -785,6 +785,39 @@ Elm.Color.make = function (_elm) {
                        ,darkGray: darkGray};
    return _elm.Color.values;
 };
+Elm.Console = Elm.Console || {};
+Elm.Console.make = function (_elm) {
+   "use strict";
+   _elm.Console = _elm.Console || {};
+   if (_elm.Console.values)
+   return _elm.Console.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Console",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Console = Elm.Native.Console.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var fatal = function (value) {
+      return $Native$Console.fatal(value);
+   };
+   var error = function (value) {
+      return $Native$Console.error(value);
+   };
+   var log = function (value) {
+      return $Native$Console.log(value);
+   };
+   _elm.Console.values = {_op: _op
+                         ,log: log
+                         ,error: error
+                         ,fatal: fatal};
+   return _elm.Console.values;
+};
 Elm.Debug = Elm.Debug || {};
 Elm.Debug.make = function (_elm) {
    "use strict";
@@ -1800,6 +1833,53 @@ Elm.Dict.make = function (_elm) {
                       ,fromList: fromList};
    return _elm.Dict.values;
 };
+Elm.File = Elm.File || {};
+Elm.File.make = function (_elm) {
+   "use strict";
+   _elm.File = _elm.File || {};
+   if (_elm.File.values)
+   return _elm.File.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "File",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$File = Elm.Native.File.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var lstat = function (path) {
+      return $Native$File.lstat(path);
+   };
+   var Stat = {_: {}};
+   var write = F2(function (path,
+   data) {
+      return A2($Native$File.write,
+      path,
+      data);
+   });
+   var read = function (path) {
+      return $Native$File.read(path);
+   };
+   var WriteError = function (a) {
+      return {ctor: "WriteError"
+             ,_0: a};
+   };
+   var ReadError = function (a) {
+      return {ctor: "ReadError"
+             ,_0: a};
+   };
+   _elm.File.values = {_op: _op
+                      ,read: read
+                      ,write: write
+                      ,lstat: lstat
+                      ,ReadError: ReadError
+                      ,WriteError: WriteError};
+   return _elm.File.values;
+};
 Elm.Graphics = Elm.Graphics || {};
 Elm.Graphics.Collage = Elm.Graphics.Collage || {};
 Elm.Graphics.Collage.make = function (_elm) {
@@ -2688,6 +2768,36 @@ Elm.Graphics.Element.make = function (_elm) {
                                   ,Position: Position};
    return _elm.Graphics.Element.values;
 };
+Elm.Http = Elm.Http || {};
+Elm.Http.make = function (_elm) {
+   "use strict";
+   _elm.Http = _elm.Http || {};
+   if (_elm.Http.values)
+   return _elm.Http.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Http",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Http = Elm.Native.Http.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var get = function (url) {
+      return $Native$Http.get(url);
+   };
+   var NetworkError = function (a) {
+      return {ctor: "NetworkError"
+             ,_0: a};
+   };
+   _elm.Http.values = {_op: _op
+                      ,get: get
+                      ,NetworkError: NetworkError};
+   return _elm.Http.values;
+};
 Elm.Import = Elm.Import || {};
 Elm.Import.make = function (_elm) {
    "use strict";
@@ -3373,221 +3483,253 @@ Elm.Main.make = function (_elm) {
    _L = _N.List.make(_elm),
    $moduleName = "Main",
    $Basics = Elm.Basics.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Import = Elm.Import.make(_elm),
+   $Console = Elm.Console.make(_elm),
+   $File = Elm.File.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Package = Elm.Package.make(_elm),
+   $Oracle = Elm.Oracle.make(_elm),
+   $Path = Elm.Path.make(_elm),
+   $Process = Elm.Process.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var encodeInfo = function (info) {
-      return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
-                                               ,_0: "name"
-                                               ,_1: $Json$Encode.string(info.name)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "fullName"
-                                               ,_1: $Json$Encode.string(info.fullName)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "href"
-                                               ,_1: $Json$Encode.string(info.href)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "signature"
-                                               ,_1: $Json$Encode.string(info.signature)}
-                                              ,{ctor: "_Tuple2"
-                                               ,_0: "comment"
-                                               ,_1: $Json$Encode.string(info.comment)}]));
-   };
-   var Info = F5(function (a,
-   b,
-   c,
-   d,
-   e) {
-      return {_: {}
-             ,comment: e
-             ,fullName: b
-             ,href: c
-             ,name: a
-             ,signature: d};
-   });
-   var moduleToDocs = F2(function (modul,
-   _v0) {
-      return function () {
-         return function () {
-            var dotToHyphen = function (string) {
-               return A2($String.map,
-               function (c) {
-                  return _U.eq(c,
-                  _U.chr(".")) ? _U.chr("-") : c;
-               },
-               string);
-            };
-            var urlTo = function (name) {
+   $Task = Elm.Task.make(_elm);
+   var tryCatch = $Basics.flip($Task.onError);
+   var loadDocs = function () {
+      var load = function (path) {
+         return $Task.mapError(function (_v0) {
+            return function () {
                return A2($Basics._op["++"],
-               "http://package.elm-lang.org/packages/",
-               A2($Basics._op["++"],
-               modul.packageName,
-               A2($Basics._op["++"],
-               "/latest/",
-               A2($Basics._op["++"],
-               dotToHyphen(modul.name),
-               A2($Basics._op["++"],
-               "#",
-               name)))));
-            };
-            var nameToPair = function (vname) {
-               return function () {
-                  var name = vname.name;
-                  var fullName = A2($Basics._op["++"],
-                  modul.name,
-                  A2($Basics._op["++"],".",name));
-                  var info = A5(Info,
-                  name,
-                  fullName,
-                  urlTo(name),
-                  vname.signature,
-                  vname.comment);
-                  var localName = A2($Basics._op["++"],
-                  A2($Maybe.withDefault,
-                  modul.name,
-                  _v0.alias),
-                  A2($Basics._op["++"],".",name));
-                  var pairs = _L.fromArray([{ctor: "_Tuple2"
-                                            ,_0: localName
-                                            ,_1: info}]);
-                  return function () {
-                     var _v2 = _v0.exposed;
-                     switch (_v2.ctor)
-                     {case "Every":
-                        return A2($List._op["::"],
-                          {ctor: "_Tuple2"
-                          ,_0: name
-                          ,_1: info},
-                          pairs);
-                        case "None": return pairs;
-                        case "Some":
-                        return A2($Set.member,
-                          name,
-                          _v2._0) ? A2($List._op["::"],
-                          {ctor: "_Tuple2"
-                          ,_0: name
-                          ,_1: info},
-                          pairs) : pairs;}
-                     _U.badCase($moduleName,
-                     "between lines 81 and 89");
-                  }();
-               }();
-            };
-            var typeToPair = F2(function (type$,
-            tag) {
-               return function () {
-                  var fullName = A2($Basics._op["++"],
-                  modul.name,
-                  A2($Basics._op["++"],".",tag));
-                  var info = A5(Info,
-                  tag,
-                  fullName,
-                  urlTo(type$),
-                  "",
-                  "");
-                  return _L.fromArray([{ctor: "_Tuple2"
-                                       ,_0: tag
-                                       ,_1: info}
-                                      ,{ctor: "_Tuple2"
-                                       ,_0: fullName
-                                       ,_1: info}]);
-               }();
-            });
-            return A2($Basics._op["++"],
-            A2($List.concatMap,
-            nameToPair,
-            A2($Basics._op["++"],
-            modul.values.aliases,
-            modul.values.values)),
-            A2($List.concatMap,
+               "Could not load docs from ",
+               path);
+            }();
+         })(A2($Task.andThen,
+         $File.read(path),
+         function ($) {
+            return $Task.succeed(F2(function (v0,
+            v1) {
+               return {ctor: "_Tuple2"
+                      ,_0: v0
+                      ,_1: v1};
+            })(path)($));
+         }));
+      };
+      return function ($) {
+         return $Task.sequence($List.map(function ($) {
+            return load(function (_) {
+               return _.local;
+            }($));
+         })($));
+      };
+   }();
+   var downloadDocs = function () {
+      var write = F2(function (path,
+      data) {
+         return $Task.mapError(function (_v2) {
+            return function () {
+               return A2($Basics._op["++"],
+               "Could not download docs to ",
+               path);
+            }();
+         })(A2($File.write,path,data));
+      });
+      var pull = function (path) {
+         return $Task.mapError(function (_v6) {
+            return function () {
+               return A2($Basics._op["++"],
+               "Could not download docs from ",
+               path);
+            }();
+         })(A2($Task.andThen,
+         $Http.get(path),
+         function (d) {
+            return A2($Task.andThen,
+            $Console.log(d),
             function (_v4) {
                return function () {
-                  switch (_v4.ctor)
-                  {case "_Tuple2":
-                     return A2($List.concatMap,
-                       typeToPair(_v4._0),
-                       _v4._1);}
-                  _U.badCase($moduleName,
-                  "on line 98, column 46 to 84");
+                  return $Task.succeed(d);
                }();
-            },
-            modul.values.types));
-         }();
-      }();
-   });
-   var collate = F3(function (imports,
-   moduleList,
-   filterName) {
-      return function () {
-         var accept = function (_v8) {
+            });
+         }));
+      };
+      var test = function (path) {
+         return $Task.mapError(function (_v10) {
             return function () {
-               switch (_v8.ctor)
+               return path;
+            }();
+         })(A2($Task.andThen,
+         $File.lstat(path),
+         function (_v8) {
+            return function () {
+               return $Task.succeed({ctor: "_Tuple0"});
+            }();
+         }));
+      };
+      var download = function (path) {
+         return A2($Task.onError,
+         test(path.local),
+         function (_v12) {
+            return function () {
+               return A2($Task.andThen,
+               pull(path.network),
+               write(path.local));
+            }();
+         });
+      };
+      return function ($) {
+         return $Task.sequence($List.map(download)($));
+      };
+   }();
+   var parseDeps = function (json) {
+      return function () {
+         var network = "http://package.elm-lang.org";
+         var local = "elm-stuff";
+         var buildDocPath = function (_v14) {
+            return function () {
+               switch (_v14.ctor)
                {case "_Tuple2":
-                  return A2($String.startsWith,
-                    filterName,
-                    _v8._0) ? $Maybe.Just(_v8._1) : $Maybe.Nothing;}
+                  return function () {
+                       var path = A2($Basics._op["++"],
+                       "/packages/",
+                       A2($Basics._op["++"],
+                       _v14._0,
+                       A2($Basics._op["++"],
+                       "/",
+                       A2($Basics._op["++"],
+                       _v14._1,
+                       "/documentation.json"))));
+                       return {_: {}
+                              ,local: A2($Basics._op["++"],
+                              local,
+                              path)
+                              ,network: A2($Basics._op["++"],
+                              network,
+                              path)};
+                    }();}
                _U.badCase($moduleName,
-               "between lines 56 and 58");
+               "between lines 98 and 100");
             }();
          };
-         var getInfo = function (modul) {
-            return A2($Maybe.map,
-            moduleToDocs(modul),
-            A2($Dict.get,
-            modul.name,
-            imports));
-         };
-         return $List.filterMap(accept)($List.concat(A2($List.filterMap,
-         getInfo,
-         moduleList)));
+         var decoder = $Json$Decode.keyValuePairs($Json$Decode.string);
+         var deps = A2($Json$Decode.decodeString,
+         decoder,
+         json);
+         return function () {
+            switch (deps.ctor)
+            {case "Err":
+               return $Result.Err("Could not decode the dependencies file.");
+               case "Ok":
+               return $Result.Ok(A2($List.map,
+                 buildDocPath,
+                 deps._0));}
+            _U.badCase($moduleName,
+            "between lines 102 and 104");
+         }();
       }();
+   };
+   var loadDeps = function () {
+      var errorMessage = function (err) {
+         return "Dependencies file is missing. Perhaps you need to run `elm-package install`?";
+      };
+      return $Task.mapError(errorMessage)($File.read($Path.resolve(_L.fromArray(["elm-stuff"
+                                                                                ,"exact-dependencies.json"]))));
+   }();
+   var loadSource = function (path) {
+      return function () {
+         var errorMessage = function (err) {
+            return A2($Basics._op["++"],
+            "Could not find the given source file: ",
+            path);
+         };
+         return $Task.mapError(errorMessage)($File.read($Path.normalize(path)));
+      }();
+   };
+   var emitError = function (message) {
+      return function () {
+         var json = $Json$Encode.encode(0)($Json$Encode.list(_L.fromArray([$Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
+                                                                                                             ,_0: "error"
+                                                                                                             ,_1: $Json$Encode.string(message)}]))])));
+         return $Console.fatal(json);
+      }();
+   };
+   var Warn = function (a) {
+      return {ctor: "Warn",_0: a};
+   };
+   var Search = F2(function (a,b) {
+      return {ctor: "Search"
+             ,_0: a
+             ,_1: b};
    });
-   var docs = Elm.Native.Port.make(_elm).inbound("docs",
-   "List (String, String)",
-   function (v) {
-      return typeof v === "object" && v instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.map(function (v) {
-         return typeof v === "object" && v instanceof Array ? {ctor: "_Tuple2"
-                                                              ,_0: typeof v[0] === "string" || typeof v[0] === "object" && v[0] instanceof String ? v[0] : _U.badPort("a string",
-                                                              v[0])
-                                                              ,_1: typeof v[1] === "string" || typeof v[1] === "object" && v[1] instanceof String ? v[1] : _U.badPort("a string",
-                                                              v[1])} : _U.badPort("an array",
-         v);
-      })) : _U.badPort("an array",v);
-   });
-   var query = Elm.Native.Port.make(_elm).inbound("query",
-   "String",
-   function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
-      v);
-   });
-   var code = Elm.Native.Port.make(_elm).inbound("code",
-   "String",
-   function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
-      v);
-   });
-   var response = Elm.Native.Port.make(_elm).outbound("response",
-   function (v) {
-      return v;
-   },
-   function () {
-      var infos = A3(collate,
-      $Import.parse(code),
-      $Package.parse(docs),
-      query);
-      return $Json$Encode.encode(0)($Json$Encode.list(A2($List.map,
-      encodeInfo,
-      infos)));
+   var Help = {ctor: "Help"};
+   var parsedArgs = function () {
+      var _v21 = $Process.args;
+      switch (_v21.ctor)
+      {case "::": switch (_v21._0)
+           {case "--help": return Help;
+              case "-h": return Help;}
+           switch (_v21._1.ctor)
+           {case "::": return A2(Search,
+                _v21._0,
+                _v21._1._0);
+              case "[]":
+              return Warn("You did not supply a query.");}
+           break;
+         case "[]":
+         return Warn("You did not supply a source file or query.");}
+      return Warn("Unknown error with your search.");
+   }();
+   var usage = "elm-oracle 1.0.0\n\nUsage: elm-oracle FILE query\n  Query for information about a token in an Elm file.\n  \nAvailable options:\n  -h,--help                    Show this help text.";
+   var main = Elm.Native.Task.make(_elm).perform(function () {
+      switch (parsedArgs.ctor)
+      {case "Help":
+         return $Console.log(usage);
+         case "Search":
+         return tryCatch(emitError)(A2($Task.andThen,
+           loadSource(parsedArgs._0),
+           function (source) {
+              return A2($Task.andThen,
+              loadDeps,
+              function (deps) {
+                 return A2($Task.andThen,
+                 $Task.fromResult(parseDeps(deps)),
+                 function (docPaths) {
+                    return A2($Task.andThen,
+                    downloadDocs(docPaths),
+                    function (_v30) {
+                       return function () {
+                          return A2($Task.andThen,
+                          loadDocs(docPaths),
+                          function (docs) {
+                             return $Console.log(A3($Oracle.search,
+                             parsedArgs._1,
+                             source,
+                             docs));
+                          });
+                       }();
+                    });
+                 });
+              });
+           }));
+         case "Warn":
+         return emitError(parsedArgs._0);}
+      _U.badCase($moduleName,
+      "between lines 17 and 31");
    }());
    _elm.Main.values = {_op: _op
-                      ,Info: Info};
+                      ,usage: usage
+                      ,Help: Help
+                      ,Search: Search
+                      ,Warn: Warn
+                      ,parsedArgs: parsedArgs
+                      ,emitError: emitError
+                      ,loadSource: loadSource
+                      ,loadDeps: loadDeps
+                      ,parseDeps: parseDeps
+                      ,downloadDocs: downloadDocs
+                      ,loadDocs: loadDocs
+                      ,tryCatch: tryCatch};
    return _elm.Main.values;
 };
 Elm.Maybe = Elm.Maybe || {};
@@ -4845,6 +4987,86 @@ Elm.Native.Color.make = function(localRuntime) {
 
 };
 
+Elm.Native = Elm.Native || {};
+Elm.Native.Console = Elm.Native.Console || {};
+
+Elm.Native.Console.make = function(localRuntime) {
+	'use strict';
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Console = localRuntime.Native.Console || {};
+	if ('values' in localRuntime.Native.Console) {
+		return localRuntime.Native.Console.values;
+	}
+
+	var Show = Elm.Native.Show.make(localRuntime);
+	var Task = Elm.Native.Task.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+
+	function log(value) {
+		return Task.asyncFunction(function(callback) {
+			if (typeof value == "string") {
+				console.log(value);
+			} else {
+				console.log(Show.toString(value));
+			}
+			return callback(Task.succeed(Utils.Tuple0));
+		});
+	}
+
+	function error(value) {
+		return Task.asyncFunction(function(callback) {
+			if (typeof value == "string") {
+				console.error(value);
+			} else {
+				console.error(Show.toString(value));
+			}
+			return callback(Task.succeed(Utils.Tuple0));
+		});
+	}
+
+	function fatal(value) {
+		return Task.asyncFunction(function(callback) {
+			if (typeof value == "string") {
+				console.error(value);
+			} else {
+				console.error(Show.toString(value));
+			}
+			process.exit(1);
+			return callback(Task.succeed(Utils.Tuple0));
+		});
+	}
+
+	return localRuntime.Native.Console.values = {
+		log: log,
+		error: error,
+		fatal: fatal,
+	};
+};
+
+(function() {
+	if (typeof module == 'undefined') {
+		throw new Error('You are trying to run a node Elm program in the browser!');
+	}
+
+	if (module.exports === Elm) {
+		return;
+	}
+
+	window = global;
+
+	module.exports = Elm;
+	setTimeout(function() {
+		if (!module.parent) {
+			if ('Main' in Elm) {
+				setImmediate(Elm.worker, Elm.Main);
+			} else {
+				throw new Error('You are trying to run a node Elm program without a Main module.');
+			}
+		}
+	});
+})();
+
 Elm.Native.Debug = {};
 Elm.Native.Debug.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
@@ -4911,6 +5133,87 @@ Elm.Native.Debug.make = function(localRuntime) {
 		watchSummary:F3(watchSummary),
 	};
 };
+
+Elm.Native = Elm.Native || {};
+Elm.Native.File = Elm.Native.File || {};
+
+Elm.Native.File.make = function(localRuntime) {
+	'use strict';
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.File = localRuntime.Native.File || {};
+	if ('values' in localRuntime.Native.File) {
+		return localRuntime.Native.File.values;
+	}
+
+	var Task = Elm.Native.Task.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+
+	var fs = require('fs');
+
+	function read(path) {
+		return Task.asyncFunction(function(callback) {
+			fs.readFile(path, 'utf8', function(err, data) {
+				if (err) {
+					return callback(Task.fail({ ctor: 'ReadError', _0: err.path }));
+				}
+				return callback(Task.succeed(data));
+			});
+		});
+	}
+
+	function write(path, data) {
+		return Task.asyncFunction(function(callback) {
+			fs.writeFile(path, data, function(err) {
+				if (err) {
+					return callback(Task.fail({ ctor: 'WriteError', _0: err.path }));
+				}
+				return callback(Task.succeed(Utils.Tuple0));
+			});
+		});
+	}
+
+	function lstat(path) {
+		return Task.asyncFunction(function(callback) {
+			fs.lstat(path, function(err, stat) {
+				if (err) {
+					return callback(Task.fail({ ctor: 'ReadError', _0: "" }));
+				}
+				stat['_'] = {};
+				return callback(Task.succeed(stat));
+			});
+		});
+	}
+
+	return localRuntime.Native.File.values = {
+		read: read,
+		write: F2(write),
+		lstat: lstat,
+	};
+};
+
+(function() {
+	if (module.exports === Elm) {
+		return;
+	}
+
+	if (typeof module == 'undefined') {
+		throw new Error('You are trying to run a node Elm program in the browser!');
+	}
+
+	window = global;
+
+	module.exports = Elm;
+	setTimeout(function() {
+		if (!module.parent) {
+			if ('Main' in Elm) {
+				setImmediate(Elm.worker, Elm.Main);
+			} else {
+				throw new Error('You are trying to run a node Elm program without a Main module.');
+			}
+		}
+	});
+})();
 
 
 // setup
@@ -6289,6 +6592,67 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 };
 
+Elm.Native = Elm.Native || {};
+Elm.Native.Http = Elm.Native.Http || {};
+
+Elm.Native.Http.make = function(localRuntime) {
+	'use strict';
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Http = localRuntime.Native.Http || {};
+	if ('values' in localRuntime.Native.Http) {
+		return localRuntime.Native.Http.values;
+	}
+
+	var Task = Elm.Native.Task.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+
+	var http = require('http');
+
+	function get(url) {
+		return Task.asyncFunction(function(callback) {
+			http.get(url, function(res) {
+				var data = "";
+				res.on("data", function (chunk) {
+						data += chunk.toString();
+				});
+				res.on("end", function () {
+					return callback(Task.succeed(data));
+				});
+			}).on('error', function(err) {
+				return callback(Task.fail({ ctor: 'NetworkError', _0: url }));
+			});
+		});
+	}
+
+	return localRuntime.Native.Http.values = {
+		get: get,
+	};
+};
+
+(function() {
+	if (module.exports === Elm) {
+		return;
+	}
+
+	if (typeof module == 'undefined') {
+		throw new Error('You are trying to run a node Elm program in the browser!');
+	}
+
+	window = global;
+
+	module.exports = Elm;
+	setTimeout(function() {
+		if (!module.parent) {
+			if ('Main' in Elm) {
+				setImmediate(Elm.worker, Elm.Main);
+			} else {
+				throw new Error('You are trying to run a node Elm program without a Main module.');
+			}
+		}
+	});
+})();
+
 Elm.Native.Json = {};
 Elm.Native.Json.make = function(localRuntime) {
 
@@ -7002,73 +7366,90 @@ Elm.Native.List.make = function(localRuntime) {
 
 };
 
+Elm.Native = Elm.Native || {};
+Elm.Native.Path = Elm.Native.Path || {};
+
+Elm.Native.Path.make = function(localRuntime) {
+	'use strict';
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Path = localRuntime.Native.Path || {};
+	if ('values' in localRuntime.Native.Path) {
+		return localRuntime.Native.Path.values;
+	}
+
+	var List = Elm.Native.List.make(localRuntime);
+
+	var path = require('path');
+
+	function normalize(p) {
+		return path.normalize(p);
+	}
+
+	function join(ps) {
+		return path.join.apply(path.join, List.toArray(ps));
+	}
+
+	function resolve(ps) {
+		return path.resolve.apply(path.resolve, List.toArray(ps));
+	}
+
+	function isAbsolute(p) {
+		return path.isAbsolute(p);
+	}
+
+	function relative(fromP, toP) {
+		return path.relative(fromP, toP);
+	}
+
+	function dirname(p) {
+		return path.dirname(p);
+	}
+
+	function basename(p, ext) {
+		return path.basename(p, ext);
+	}
+
+	function extname(p) {
+		return path.extname(p);
+	}
+
+	return localRuntime.Native.Path.values = {
+		normalize: normalize,
+		join: join,
+		resolve: resolve,
+		isAbsolute: isAbsolute,
+		relative: F2(relative),
+		dirname: dirname,
+		basename: F2(basename),
+		extname: extname,
+		sep: path.sep,
+		delimiter: path.delimier,
+	};
+};
+
 (function() {
-	var fs = require('fs');
-	var rest = require('rest');
-	var when = require('when');
-
-	setTimeout(main, 0);
-
-	function main() {
-		var args = process.argv.slice(2);
-		if (args.length < 2) {
-			console.log("Takes one elm file and one token.");
-			return;
-		}
-
-		var modules = JSON.parse(readFile("elm-stuff/exact-dependencies.json"));
-		var packages = [];
-		for (var module in modules) {
-			packages.push({name: module, version: modules[module]});
-		}
-
-		when.all(pullDocs(packages)).done(function() {
-			var worker = Elm.worker(Elm.Main, {
-				code: readFile(args[0]),
-				query: args[1],
-				docs: loadDocs(packages),
-			});
-
-			console.log(worker.ports.response);
-		});
+	if (typeof module == 'undefined') {
+		throw new Error('You are trying to run a node Elm program in the browser!');
 	}
 
-	function readFile(relPath) {
-		return fs.readFileSync(relPath, {"encoding": "utf8"});
+	if (module.exports === Elm) {
+		return;
 	}
 
-	function pullDocs(packages) {
-		var docs = [];
+	window = global;
 
-		for (var i in packages) {
-			var pack = packages[i];
-			var docPath = "elm-stuff/packages/" + pack.name + "/" + pack.version + "/documentation.json";
-
-			try {
-				fs.lstatSync(docPath);
-			} catch (e) {
-				var httpPath = "http://package.elm-lang.org/packages/" + pack.name + "/" + pack.version + "/documentation.json";
-				docs.push(rest(httpPath).then(function(response) {
-					var dp = "elm-stuff" + response.raw.request.path;
-					fs.writeFileSync(dp, response.entity);
-				}));
+	module.exports = Elm;
+	setTimeout(function() {
+		if (!module.parent) {
+			if ('Main' in Elm) {
+				setImmediate(Elm.worker, Elm.Main);
+			} else {
+				throw new Error('You are trying to run a node Elm program without a Main module.');
 			}
 		}
-
-		return docs;
-	}
-
-	function loadDocs(packages) {
-		var docs = [];
-		for (var i in packages) {
-			var pack = packages[i];
-			var docPath = "elm-stuff/packages/" + pack.name + "/" + pack.version + "/documentation.json";
-			docs.push([pack.name, readFile(docPath)]);
-		}
-
-		return docs
-	}
-})()
+	});
+})();
 
 Elm.Native.Port = {};
 Elm.Native.Port.make = function(localRuntime) {
@@ -7203,6 +7584,62 @@ Elm.Native.Port.make = function(localRuntime) {
 		outboundSignal: outboundSignal
 	};
 };
+
+Elm.Native = Elm.Native || {};
+Elm.Native.Process = Elm.Native.Process || {};
+
+Elm.Native.Process.make = function(localRuntime) {
+	'use strict';
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Process = localRuntime.Native.Process || {};
+	if ('values' in localRuntime.Native.Process) {
+		return localRuntime.Native.Process.values;
+	}
+
+	var Task = Elm.Native.Task.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+	var List = Elm.Native.List.make(localRuntime);
+
+	function exit(error) {
+		return Task.asyncFunction(function(callback) {
+			process.exit(error);
+			return callback(Task.succeed(Utils.Tuple0));
+		});
+	}
+
+	return localRuntime.Native.Process.values = {
+		argv: List.fromArray(process.argv),
+		execPath: process.execPath,
+		execArgv: List.fromArray(process.execArgv),
+		exit: exit,
+		pid: process.pid,
+		version: process.version,
+	};
+};
+
+(function() {
+	if (module.exports === Elm) {
+		return;
+	}
+
+	if (typeof module == 'undefined') {
+		throw new Error('You are trying to run a node Elm program in the browser!');
+	}
+
+	window = global;
+
+	module.exports = Elm;
+	setTimeout(function() {
+		if (!module.parent) {
+			if ('Main' in Elm) {
+				setImmediate(Elm.worker, Elm.Main);
+			} else {
+				throw new Error('You are trying to run a node Elm program without a Main module.');
+			}
+		}
+	});
+})();
 
 Elm.Native.Regex = {};
 Elm.Native.Regex.make = function(localRuntime) {
@@ -9970,6 +10407,215 @@ Elm.Native.Utils.make = function(localRuntime) {
 	};
 };
 
+Elm.Oracle = Elm.Oracle || {};
+Elm.Oracle.make = function (_elm) {
+   "use strict";
+   _elm.Oracle = _elm.Oracle || {};
+   if (_elm.Oracle.values)
+   return _elm.Oracle.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Oracle",
+   $Basics = Elm.Basics.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Import = Elm.Import.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Package = Elm.Package.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Set = Elm.Set.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var encodeInfo = function (info) {
+      return $Json$Encode.object(_L.fromArray([{ctor: "_Tuple2"
+                                               ,_0: "name"
+                                               ,_1: $Json$Encode.string(info.name)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "fullName"
+                                               ,_1: $Json$Encode.string(info.fullName)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "href"
+                                               ,_1: $Json$Encode.string(info.href)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "signature"
+                                               ,_1: $Json$Encode.string(info.signature)}
+                                              ,{ctor: "_Tuple2"
+                                               ,_0: "comment"
+                                               ,_1: $Json$Encode.string(info.comment)}]));
+   };
+   var Info = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return {_: {}
+             ,comment: e
+             ,fullName: b
+             ,href: c
+             ,name: a
+             ,signature: d};
+   });
+   var moduleToDocs = F2(function (modul,
+   _v0) {
+      return function () {
+         return function () {
+            var dotToHyphen = function (string) {
+               return A2($String.map,
+               function (c) {
+                  return _U.eq(c,
+                  _U.chr(".")) ? _U.chr("-") : c;
+               },
+               string);
+            };
+            var urlTo = function (name) {
+               return A2($Basics._op["++"],
+               "http://package.elm-lang.org/packages/",
+               A2($Basics._op["++"],
+               modul.packageName,
+               A2($Basics._op["++"],
+               "/latest/",
+               A2($Basics._op["++"],
+               dotToHyphen(modul.name),
+               A2($Basics._op["++"],
+               "#",
+               name)))));
+            };
+            var nameToPair = function (vname) {
+               return function () {
+                  var name = vname.name;
+                  var fullName = A2($Basics._op["++"],
+                  modul.name,
+                  A2($Basics._op["++"],".",name));
+                  var info = A5(Info,
+                  name,
+                  fullName,
+                  urlTo(name),
+                  vname.signature,
+                  vname.comment);
+                  var localName = A2($Basics._op["++"],
+                  A2($Maybe.withDefault,
+                  modul.name,
+                  _v0.alias),
+                  A2($Basics._op["++"],".",name));
+                  var pairs = _L.fromArray([{ctor: "_Tuple2"
+                                            ,_0: localName
+                                            ,_1: info}]);
+                  return function () {
+                     var _v2 = _v0.exposed;
+                     switch (_v2.ctor)
+                     {case "Every":
+                        return A2($List._op["::"],
+                          {ctor: "_Tuple2"
+                          ,_0: name
+                          ,_1: info},
+                          pairs);
+                        case "None": return pairs;
+                        case "Some":
+                        return A2($Set.member,
+                          name,
+                          _v2._0) ? A2($List._op["::"],
+                          {ctor: "_Tuple2"
+                          ,_0: name
+                          ,_1: info},
+                          pairs) : pairs;}
+                     _U.badCase($moduleName,
+                     "between lines 71 and 79");
+                  }();
+               }();
+            };
+            var typeToPair = F2(function (type$,
+            tag) {
+               return function () {
+                  var fullName = A2($Basics._op["++"],
+                  modul.name,
+                  A2($Basics._op["++"],".",tag));
+                  var info = A5(Info,
+                  tag,
+                  fullName,
+                  urlTo(type$),
+                  "",
+                  "");
+                  return _L.fromArray([{ctor: "_Tuple2"
+                                       ,_0: tag
+                                       ,_1: info}
+                                      ,{ctor: "_Tuple2"
+                                       ,_0: fullName
+                                       ,_1: info}]);
+               }();
+            });
+            return A2($Basics._op["++"],
+            A2($List.concatMap,
+            nameToPair,
+            A2($Basics._op["++"],
+            modul.values.aliases,
+            modul.values.values)),
+            A2($List.concatMap,
+            function (_v4) {
+               return function () {
+                  switch (_v4.ctor)
+                  {case "_Tuple2":
+                     return A2($List.concatMap,
+                       typeToPair(_v4._0),
+                       _v4._1);}
+                  _U.badCase($moduleName,
+                  "on line 88, column 46 to 84");
+               }();
+            },
+            modul.values.types));
+         }();
+      }();
+   });
+   var collate = F3(function (imports,
+   moduleList,
+   filterName) {
+      return function () {
+         var accept = function (_v8) {
+            return function () {
+               switch (_v8.ctor)
+               {case "_Tuple2":
+                  return A2($String.startsWith,
+                    filterName,
+                    _v8._0) ? $Maybe.Just(_v8._1) : $Maybe.Nothing;}
+               _U.badCase($moduleName,
+               "between lines 46 and 48");
+            }();
+         };
+         var getInfo = function (modul) {
+            return A2($Maybe.map,
+            moduleToDocs(modul),
+            A2($Dict.get,
+            modul.name,
+            imports));
+         };
+         return $List.filterMap(accept)($List.concat(A2($List.filterMap,
+         getInfo,
+         moduleList)));
+      }();
+   });
+   var search = F3(function (query,
+   source,
+   docs) {
+      return function () {
+         var infos = A3(collate,
+         $Import.parse(source),
+         $Package.parse(docs),
+         query);
+         return $Json$Encode.encode(0)($Json$Encode.list(A2($List.map,
+         encodeInfo,
+         infos)));
+      }();
+   });
+   _elm.Oracle.values = {_op: _op
+                        ,search: search
+                        ,Info: Info
+                        ,encodeInfo: encodeInfo
+                        ,collate: collate
+                        ,moduleToDocs: moduleToDocs};
+   return _elm.Oracle.values;
+};
 Elm.Package = Elm.Package || {};
 Elm.Package.make = function (_elm) {
    "use strict";
@@ -10068,10 +10714,10 @@ Elm.Package.make = function (_elm) {
                     return _L.fromArray([]);
                     case "Ok": return _v4._0;}
                  _U.badCase($moduleName,
-                 "between lines 13 and 15");
+                 "between lines 14 and 16");
               }();}
          _U.badCase($moduleName,
-         "between lines 13 and 15");
+         "between lines 14 and 16");
       }();
    };
    var parse = function (input) {
@@ -10083,6 +10729,106 @@ Elm.Package.make = function (_elm) {
                          ,parse: parse
                          ,Module: Module};
    return _elm.Package.values;
+};
+Elm.Path = Elm.Path || {};
+Elm.Path.make = function (_elm) {
+   "use strict";
+   _elm.Path = _elm.Path || {};
+   if (_elm.Path.values)
+   return _elm.Path.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Path",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Path = Elm.Native.Path.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var delimiter = $Native$Path.delimiter;
+   var sep = $Native$Path.sep;
+   var extname = function (path) {
+      return $Native$Path.extname(path);
+   };
+   var basename = F2(function (path,
+   ext) {
+      return A2($Native$Path.basename,
+      path,
+      ext);
+   });
+   var dirname = function (path) {
+      return $Native$Path.dirname(path);
+   };
+   var relative = F2(function (from,
+   to) {
+      return A2($Native$Path.relative,
+      from,
+      to);
+   });
+   var isAbsolute = function (path) {
+      return $Native$Path.isAbsolute(path);
+   };
+   var resolve = function (paths) {
+      return $Native$Path.resolve(paths);
+   };
+   var join = function (paths) {
+      return $Native$Path.join(paths);
+   };
+   var normalize = function (path) {
+      return $Native$Path.normalize(path);
+   };
+   _elm.Path.values = {_op: _op
+                      ,normalize: normalize
+                      ,join: join
+                      ,resolve: resolve
+                      ,isAbsolute: isAbsolute
+                      ,relative: relative
+                      ,basename: basename
+                      ,extname: extname
+                      ,sep: sep
+                      ,delimiter: delimiter};
+   return _elm.Path.values;
+};
+Elm.Process = Elm.Process || {};
+Elm.Process.make = function (_elm) {
+   "use strict";
+   _elm.Process = _elm.Process || {};
+   if (_elm.Process.values)
+   return _elm.Process.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Process",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Process = Elm.Native.Process.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var version = $Native$Process.version;
+   var pid = $Native$Process.pid;
+   var exit = function (code) {
+      return $Native$Process.exit(code);
+   };
+   var execArgv = $Native$Process.execArgv;
+   var execPath = $Native$Process.execPath;
+   var args = A2($List.drop,
+   2,
+   $Native$Process.argv);
+   var argv = $Native$Process.argv;
+   _elm.Process.values = {_op: _op
+                         ,args: args
+                         ,argv: argv
+                         ,execPath: execPath
+                         ,execArgv: execArgv
+                         ,exit: exit
+                         ,pid: pid
+                         ,version: version};
+   return _elm.Process.values;
 };
 Elm.Regex = Elm.Regex || {};
 Elm.Regex.make = function (_elm) {
