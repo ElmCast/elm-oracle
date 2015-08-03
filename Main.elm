@@ -1,7 +1,7 @@
 module Main where
 
-import Json.Encode
-import Json.Decode
+import Json.Encode as Encode
+import Json.Decode as Decode
 import Task exposing (Task, andThen, onError)
 
 import Console
@@ -9,6 +9,7 @@ import File
 import Http
 import Path
 import Process
+import Url
 
 import Oracle
 
@@ -55,34 +56,16 @@ parsedArgs =
     _ -> Warn "Unknown error with your search."
 
 
-emitError : String -> Task x ()
-emitError message =
-  let json =
-        [Json.Encode.object [ ("error", Json.Encode.string (message)) ]]
-          |> Json.Encode.list
-          |> Json.Encode.encode 0
-  in
-    Console.fatal json
-
-
 loadSource : String -> Task String String
 loadSource path =
-  let errorMessage err =
-        "Could not find the given source file: " ++ path
-  in
-      Path.normalize path
-        |> File.read
-        |> Task.mapError errorMessage
+  File.read (Path.normalize path)
+    `withError` ("Could not find the give source file: " ++ path)
 
 
 loadDeps : Task String String
 loadDeps =
-  let errorMessage err =
-        "Dependencies file is missing. Perhaps you need to run `elm-package install`?"
-  in
-      Path.resolve ["elm-stuff", "exact-dependencies.json"]
-        |> File.read
-        |> Task.mapError errorMessage
+  File.read (Path.resolve ["elm-stuff", "exact-dependencies.json"])
+    `withError` "Dependencies file is missing. Perhaps you need to run `elm-package install`?"
 
 
 type alias DocPaths = List { local : String, network : String }
@@ -90,14 +73,13 @@ type alias DocPaths = List { local : String, network : String }
 
 parseDeps : String -> Result String DocPaths
 parseDeps json =
-  let decoder = Json.Decode.keyValuePairs Json.Decode.string
-      deps = Json.Decode.decodeString decoder json
-      local = "elm-stuff"
-      network = "http://package.elm-lang.org"
+  let deps = Decode.decodeString (Decode.keyValuePairs Decode.string) json
       buildDocPath (name, version) =
-        let path = "/packages/" ++ name ++ "/" ++ version ++ "/documentation.json"
+        let docFile = "documentation.json"
+            local = Path.resolve ["elm-stuff", "packages", name, version, docFile]
+            network = Url.join ["http://package.elm-lang.org", "packages", name, version, docFile]
         in 
-            { local = local ++ path, network = network ++ path }
+            { local = local, network = network }
   in
       case deps of
         Ok packages -> Ok <| List.map buildDocPath packages
@@ -107,16 +89,13 @@ parseDeps json =
 downloadDocs : DocPaths -> Task String (List ())
 downloadDocs =
   let test path =
-        (File.lstat path `andThen` \_ -> Task.succeed ())
-          |> Task.mapError (\_ -> path)
+        (File.lstat path `andThen` \_ -> Task.succeed ()) `withError` path
 
       pull path =
-        (Http.get path `andThen` \d -> Console.log d `andThen` \_ -> Task.succeed d)
-          |> Task.mapError (\_ -> "Could not download docs from " ++ path)
+        Http.get path `withError` ("Could not download docs from " ++ path)
 
       write path data =
-        File.write path data
-          |> Task.mapError (\_ -> "Could not download docs to " ++ path)
+        File.write path data `withError` ("Could not download docs to " ++ path)
 
       download path =
         test path.local
@@ -129,11 +108,25 @@ downloadDocs =
 loadDocs : DocPaths -> Task String (List (String, String))
 loadDocs =
   let load path =
-        File.read path
-          `andThen` (Task.succeed << (,) path)
-            |> Task.mapError (\_ -> "Could not load docs from " ++ path)
+        (File.read path `andThen` (Task.succeed << (,) path))
+          `withError` ("Could not load docs from " ++ path)
   in
       Task.sequence << List.map (.local >> load)
+
+
+emitError : String -> Task x ()
+emitError message =
+  let json =
+        [Encode.object [ ("error", Encode.string (message)) ]]
+          |> Encode.list
+          |> Encode.encode 0
+  in
+    Console.fatal json
+
+
+withError : Task x a -> y -> Task y a
+withError task error =
+  Task.mapError (\_ -> error) task
 
 
 tryCatch : (x -> Task y a) -> Task x a -> Task y a
