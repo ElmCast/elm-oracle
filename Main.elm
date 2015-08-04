@@ -29,6 +29,8 @@ port main =
           `andThen` \deps -> Task.fromResult (parseDeps deps)
           `andThen` \docPaths -> downloadDocs docPaths
           `andThen` \_ -> loadDocs docPaths
+          `andThen` \depsDocs -> getProjectDocs
+          `andThen` \projectDocs -> Task.succeed (projectDocs ++ depsDocs)
           `andThen` \docs -> Console.log (Oracle.search query source docs)
 
 
@@ -112,6 +114,23 @@ loadDocs =
           `withError` ("Could not load docs from " ++ path)
   in
       Task.sequence << List.map (.local >> load)
+
+
+getProjectDocs : Task String (List (String, String))
+getProjectDocs =
+  let path = Path.resolve ["elm-stuff", "documentation.json"]
+
+      generate =
+        Process.exec ("elm-make Main.elm --docs " ++ path)
+          `withError` "Failed to generate local project docs."
+
+      load =
+        File.read path
+          `withError` "Failed to load local project docs."
+  in
+      generate
+        `andThen` \_ -> load
+        `andThen` \docs -> Task.succeed [(path, docs)]
 
 
 emitError : String -> Task x ()

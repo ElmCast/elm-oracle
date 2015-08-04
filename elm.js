@@ -3516,6 +3516,31 @@ Elm.Main.make = function (_elm) {
          return $Console.fatal(json);
       }();
    };
+   var getProjectDocs = function () {
+      var path = $Path.resolve(_L.fromArray(["elm-stuff"
+                                            ,"documentation.json"]));
+      var generate = A2(withError,
+      $Process.exec(A2($Basics._op["++"],
+      "elm-make Main.elm --docs ",
+      path)),
+      "Failed to generate local project docs.");
+      var load = A2(withError,
+      $File.read(path),
+      "Failed to load local project docs.");
+      return A2($Task.andThen,
+      generate,
+      function (_v2) {
+         return function () {
+            return A2($Task.andThen,
+            load,
+            function (docs) {
+               return $Task.succeed(_L.fromArray([{ctor: "_Tuple2"
+                                                  ,_0: path
+                                                  ,_1: docs}]));
+            });
+         }();
+      });
+   }();
    var loadDocs = function () {
       var load = function (path) {
          return A2(withError,
@@ -3561,7 +3586,7 @@ Elm.Main.make = function (_elm) {
          return A2(withError,
          A2($Task.andThen,
          $File.lstat(path),
-         function (_v2) {
+         function (_v4) {
             return function () {
                return $Task.succeed({ctor: "_Tuple0"});
             }();
@@ -3571,7 +3596,7 @@ Elm.Main.make = function (_elm) {
       var download = function (path) {
          return A2($Task.onError,
          test(path.local),
-         function (_v4) {
+         function (_v6) {
             return function () {
                return A2($Task.andThen,
                pull(path.network),
@@ -3585,28 +3610,28 @@ Elm.Main.make = function (_elm) {
    }();
    var parseDeps = function (json) {
       return function () {
-         var buildDocPath = function (_v6) {
+         var buildDocPath = function (_v8) {
             return function () {
-               switch (_v6.ctor)
+               switch (_v8.ctor)
                {case "_Tuple2":
                   return function () {
                        var docFile = "documentation.json";
                        var local = $Path.resolve(_L.fromArray(["elm-stuff"
                                                               ,"packages"
-                                                              ,_v6._0
-                                                              ,_v6._1
+                                                              ,_v8._0
+                                                              ,_v8._1
                                                               ,docFile]));
                        var network = $Url.join(_L.fromArray(["http://package.elm-lang.org"
                                                             ,"packages"
-                                                            ,_v6._0
-                                                            ,_v6._1
+                                                            ,_v8._0
+                                                            ,_v8._1
                                                             ,docFile]));
                        return {_: {}
                               ,local: local
                               ,network: network};
                     }();}
                _U.badCase($moduleName,
-               "between lines 78 and 82");
+               "between lines 80 and 84");
             }();
          };
          var deps = A2($Json$Decode.decodeString,
@@ -3621,7 +3646,7 @@ Elm.Main.make = function (_elm) {
                  buildDocPath,
                  deps._0));}
             _U.badCase($moduleName,
-            "between lines 84 and 86");
+            "between lines 86 and 88");
          }();
       }();
    };
@@ -3646,15 +3671,15 @@ Elm.Main.make = function (_elm) {
    });
    var Help = {ctor: "Help"};
    var parsedArgs = function () {
-      var _v13 = $Process.args;
-      switch (_v13.ctor)
-      {case "::": switch (_v13._0)
+      var _v15 = $Process.args;
+      switch (_v15.ctor)
+      {case "::": switch (_v15._0)
            {case "--help": return Help;
               case "-h": return Help;}
-           switch (_v13._1.ctor)
+           switch (_v15._1.ctor)
            {case "::": return A2(Search,
-                _v13._0,
-                _v13._1._0);
+                _v15._0,
+                _v15._1._0);
               case "[]":
               return Warn("You did not supply a query.");}
            break;
@@ -3679,15 +3704,25 @@ Elm.Main.make = function (_elm) {
                  function (docPaths) {
                     return A2($Task.andThen,
                     downloadDocs(docPaths),
-                    function (_v22) {
+                    function (_v24) {
                        return function () {
                           return A2($Task.andThen,
                           loadDocs(docPaths),
-                          function (docs) {
-                             return $Console.log(A3($Oracle.search,
-                             parsedArgs._1,
-                             source,
-                             docs));
+                          function (depsDocs) {
+                             return A2($Task.andThen,
+                             getProjectDocs,
+                             function (projectDocs) {
+                                return A2($Task.andThen,
+                                $Task.succeed(A2($Basics._op["++"],
+                                projectDocs,
+                                depsDocs)),
+                                function (docs) {
+                                   return $Console.log(A3($Oracle.search,
+                                   parsedArgs._1,
+                                   source,
+                                   docs));
+                                });
+                             });
                           });
                        }();
                     });
@@ -3697,7 +3732,7 @@ Elm.Main.make = function (_elm) {
          case "Warn":
          return emitError(parsedArgs._0);}
       _U.badCase($moduleName,
-      "between lines 18 and 32");
+      "between lines 18 and 34");
    }());
    _elm.Main.values = {_op: _op
                       ,usage: usage
@@ -3710,6 +3745,7 @@ Elm.Main.make = function (_elm) {
                       ,parseDeps: parseDeps
                       ,downloadDocs: downloadDocs
                       ,loadDocs: loadDocs
+                      ,getProjectDocs: getProjectDocs
                       ,emitError: emitError
                       ,withError: withError
                       ,tryCatch: tryCatch};
@@ -7584,6 +7620,8 @@ Elm.Native.Process.make = function(localRuntime) {
 	var Utils = Elm.Native.Utils.make(localRuntime);
 	var List = Elm.Native.List.make(localRuntime);
 
+	var child = require('child_process');
+
 	function exit(error) {
 		return Task.asyncFunction(function(callback) {
 			process.exit(error);
@@ -7591,10 +7629,23 @@ Elm.Native.Process.make = function(localRuntime) {
 		});
 	}
 
+	function exec(command) {
+		return Task.asyncFunction(function(callback) {
+			child.exec(command, function(error, stdout, stderr) {
+				if (error != null) {
+					callback(Task.fail('Exec: ' + error));
+				} else {
+					callback(Task.succeed('' + stdout));
+				}
+			});
+		});
+	}
+
 	return localRuntime.Native.Process.values = {
 		argv: List.fromArray(process.argv),
 		execPath: process.execPath,
 		execArgv: List.fromArray(process.execArgv),
+		exec: exec,
 		exit: exit,
 		pid: process.pid,
 		version: process.version,
@@ -10555,7 +10606,7 @@ Elm.Oracle.make = function (_elm) {
                           ,_1: info},
                           pairs) : pairs;}
                      _U.badCase($moduleName,
-                     "between lines 71 and 79");
+                     "between lines 80 and 88");
                   }();
                }();
             };
@@ -10594,7 +10645,7 @@ Elm.Oracle.make = function (_elm) {
                        typeToPair(_v4._0),
                        _v4._1);}
                   _U.badCase($moduleName,
-                  "on line 88, column 46 to 84");
+                  "on line 97, column 46 to 84");
                }();
             },
             modul.values.types));
@@ -10613,7 +10664,7 @@ Elm.Oracle.make = function (_elm) {
                     filterName,
                     _v8._0) ? $Maybe.Just(_v8._1) : $Maybe.Nothing;}
                _U.badCase($moduleName,
-               "between lines 46 and 48");
+               "between lines 55 and 57");
             }();
          };
          var getInfo = function (modul) {
@@ -10642,11 +10693,7 @@ Elm.Oracle.make = function (_elm) {
       }();
    });
    _elm.Oracle.values = {_op: _op
-                        ,search: search
-                        ,Info: Info
-                        ,encodeInfo: encodeInfo
-                        ,collate: collate
-                        ,moduleToDocs: moduleToDocs};
+                        ,search: search};
    return _elm.Oracle.values;
 };
 Elm.Package = Elm.Package || {};
@@ -10847,6 +10894,9 @@ Elm.Process.make = function (_elm) {
    var exit = function (code) {
       return $Native$Process.exit(code);
    };
+   var exec = function (command) {
+      return $Native$Process.exec(command);
+   };
    var execArgv = $Native$Process.execArgv;
    var execPath = $Native$Process.execPath;
    var args = A2($List.drop,
@@ -10858,6 +10908,7 @@ Elm.Process.make = function (_elm) {
                          ,argv: argv
                          ,execPath: execPath
                          ,execArgv: execArgv
+                         ,exec: exec
                          ,exit: exit
                          ,pid: pid
                          ,version: version};
