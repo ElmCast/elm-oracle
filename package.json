@@ -24,7 +24,7 @@
 		"cli"
 	],
 	"author": "Joseph Hager",
-	"license": "BSD3",
+	"license": "BSD-3-Clause",
 	"bugs": {
 		"url": "https://github.com/ElmCast/elm-oracle/issues"
 	},
