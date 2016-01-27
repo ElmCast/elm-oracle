@@ -9233,7 +9233,7 @@ Elm.Main.make = function (_elm) {
       } while (false);
       return Help;
    }();
-   var usage = "elm-oracle 1.0.0\n\nUsage: elm-oracle FILE query\n  Query for information about a token in an Elm file.\n\nAvailable options:\n  -h,--help                    Show this help text.";
+   var usage = "elm-oracle 1.1.0\n\nUsage: elm-oracle FILE query\n  Query for information about a token in an Elm file.\n\nAvailable options:\n  -h,--help                    Show this help text.";
    var main = Elm.Native.Task.make(_elm).perform(function () {
       var _p14 = parsedArgs;
       switch (_p14.ctor)

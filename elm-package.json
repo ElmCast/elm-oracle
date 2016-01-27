@@ -5,7 +5,7 @@
 	"license": "BSD3",
 	"source-directories": [
 		".",
-		"node"
+		"elm-node/src"
 	],
 	"exposed-modules": [],
 	"native-modules": true,
