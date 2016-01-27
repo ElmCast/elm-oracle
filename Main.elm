@@ -29,8 +29,8 @@ port main =
           `andThen` \deps -> Task.fromResult (parseDeps deps)
           `andThen` \docPaths -> downloadDocs docPaths
           `andThen` \_ -> loadDocs docPaths
-          `andThen` \depsDocs -> getProjectDocs
-          `andThen` \projectDocs -> Task.succeed (projectDocs ++ depsDocs)
+          --`andThen` \depsDocs -> getProjectDocs
+          --`andThen` \projectDocs -> Task.succeed (projectDocs ++ depsDocs)
           `andThen` \docs -> Console.log (Oracle.search query source docs)
 
 
@@ -39,7 +39,7 @@ usage = """elm-oracle 1.0.0
 
 Usage: elm-oracle FILE query
   Query for information about a token in an Elm file.
-  
+
 Available options:
   -h,--help                    Show this help text."""
 
@@ -55,7 +55,6 @@ parsedArgs =
     x1 :: x2 :: xs -> Search x1 x2
     x :: [] -> Warn "You did not supply a query."
     [] -> Warn "You did not supply a source file or query."
-    _ -> Warn "Unknown error with your search."
 
 
 loadSource : String -> Task String String
@@ -80,7 +79,7 @@ parseDeps json =
         let docFile = "documentation.json"
             local = Path.resolve ["elm-stuff", "packages", name, version, docFile]
             network = Url.join ["http://package.elm-lang.org", "packages", name, version, docFile]
-        in 
+        in
             { local = local, network = network }
   in
       case deps of

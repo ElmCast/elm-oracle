@@ -1,16 +1,16 @@
 {
-    "version": "1.0.0",
-    "summary": "Query for information about values in elm source files.",
-    "repository": "https://github.com/ElmCast/elm-oracle.git",
-    "license": "BSD3",
-    "source-directories": [
-			"."
-    ],
-    "exposed-modules": [],
-    "native-modules": true,
-    "dependencies": {
-			"elm-lang/core": "3.0.0 <= v < 4.0.0",
-			"elmcast/elm-node": "1.0.0 <= v < 2.0.0"
-    },
-		"elm-version": "0.15.0 <= v < 0.17.0"
+	"version": "1.1.0",
+	"summary": "Query for information about values in elm source files.",
+	"repository": "https://github.com/ElmCast/elm-oracle.git",
+	"license": "BSD3",
+	"source-directories": [
+		".",
+		"node"
+	],
+	"exposed-modules": [],
+	"native-modules": true,
+	"dependencies": {
+		"elm-lang/core": "3.0.0 <= v < 4.0.0"
+	},
+	"elm-version": "0.16.0 <= v < 0.17.0"
 }
