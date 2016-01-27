@@ -44,4 +44,10 @@ If elm-oracle encounters errors, it will return a json array or json objects lik
 [{"error": "You did not supply a source file or query."}]
 ```
 
-This information is used in [elm-vim](http://github.com/elmcast/elm-vim), [elm-mode](https://github.com/jcollard/elm-mode), [Elm.tmLanguage](https://github.com/deadfoxygrandpa/Elm.tmLanguage), and [elm-light](http://github.com/rundis/elm-light) to show the types, docs, and completions of tokens in source files.
+## Projects that use elm-oracle
+
+* Vim: [elm-vim](https://github.com/elmcast/elm-vim)
+* Atom: [atom-elm](https://github.com/edubkendo/atom-elm)
+* Emacs: [elm-mode](https://github.com/jcollard/elm-mode)
+* Sublime: [Elm.tmLanguage](https://github.com/deadfoxygrandpa/Elm.tmLanguage)
+* LightTable: [elm-light](http://github.com/rundis/elm-light)
