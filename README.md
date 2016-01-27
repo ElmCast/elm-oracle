@@ -13,7 +13,11 @@ npm install -g elm-oracle
 ## Usage
 
 ```
-$ elm-oracle FILE query
+elm-oracle FILE query
+  Query for information about a token in an Elm file.
+
+Available options:
+  -h,--help                    Show this help text.
 ```
 
 The return value will be a json array of json objects with information for each value that starts with the query string.

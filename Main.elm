@@ -35,7 +35,7 @@ port main =
 
 
 usage : String
-usage = """elm-oracle 1.0.0
+usage = """elm-oracle 1.1.0
 
 Usage: elm-oracle FILE query
   Query for information about a token in an Elm file.
