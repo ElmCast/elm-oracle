@@ -69,7 +69,7 @@ loadDeps =
     `withError` "Dependencies file is missing. Perhaps you need to run `elm-package install`?"
 
 
-type alias DocPaths = List { local : String, network : String }
+type alias DocPaths = List { local : String, network : String, name : String }
 
 
 parseDeps : String -> Result String DocPaths
@@ -80,7 +80,7 @@ parseDeps json =
             local = Path.resolve ["elm-stuff", "packages", name, version, docFile]
             network = Url.join ["http://package.elm-lang.org", "packages", name, version, docFile]
         in
-            { local = local, network = network }
+            { local = local, network = network, name = name }
   in
       case deps of
         Ok packages -> Ok <| List.map buildDocPath packages
@@ -109,10 +109,10 @@ downloadDocs =
 loadDocs : DocPaths -> Task String (List (String, String))
 loadDocs =
   let load path =
-        (File.read path `andThen` (Task.succeed << (,) path))
-          `withError` ("Could not load docs from " ++ path)
+        (File.read path.local `andThen` (Task.succeed << (,) path.name))
+          `withError` ("Could not load docs from " ++ path.local)
   in
-      Task.sequence << List.map (.local >> load)
+      Task.sequence << List.map load
 
 
 getProjectDocs : Task String (List (String, String))

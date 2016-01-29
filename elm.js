@@ -9159,43 +9159,43 @@ Elm.Main.make = function (_elm) {
       var load = function (path) {
          return A2(withError,
          A2($Task.andThen,
-         $File.read(path),
+         $File.read(path.local),
          function (_p2) {
-            return $Task.succeed(A2(F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),path,_p2));
+            return $Task.succeed(A2(F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),path.name,_p2));
          }),
-         A2($Basics._op["++"],"Could not load docs from ",path));
+         A2($Basics._op["++"],"Could not load docs from ",path.local));
       };
       return function (_p3) {
-         return $Task.sequence(A2($List.map,function (_p4) {    return load(function (_) {    return _.local;}(_p4));},_p3));
+         return $Task.sequence(A2($List.map,load,_p3));
       };
    }();
    var downloadDocs = function () {
       var write = F2(function (path,data) {    return A2(withError,A2($File.write,path,data),A2($Basics._op["++"],"Could not download docs to ",path));});
       var pull = function (path) {    return A2(withError,$Http.get(path),A2($Basics._op["++"],"Could not download docs from ",path));};
       var test = function (path) {
-         return A2(withError,A2($Task.andThen,$File.lstat(path),function (_p5) {    return $Task.succeed({ctor: "_Tuple0"});}),path);
+         return A2(withError,A2($Task.andThen,$File.lstat(path),function (_p4) {    return $Task.succeed({ctor: "_Tuple0"});}),path);
       };
       var download = function (path) {
-         return A2($Task.onError,test(path.local),function (_p6) {    return A2($Task.andThen,pull(path.network),write(path.local));});
+         return A2($Task.onError,test(path.local),function (_p5) {    return A2($Task.andThen,pull(path.network),write(path.local));});
       };
-      return function (_p7) {
-         return $Task.sequence(A2($List.map,download,_p7));
+      return function (_p6) {
+         return $Task.sequence(A2($List.map,download,_p6));
       };
    }();
    var parseDeps = function (json) {
-      var buildDocPath = function (_p8) {
-         var _p9 = _p8;
-         var _p11 = _p9._1;
-         var _p10 = _p9._0;
+      var buildDocPath = function (_p7) {
+         var _p8 = _p7;
+         var _p10 = _p8._1;
+         var _p9 = _p8._0;
          var docFile = "documentation.json";
-         var local = $Path.resolve(_U.list(["elm-stuff","packages",_p10,_p11,docFile]));
-         var network = $Url.join(_U.list(["http://package.elm-lang.org","packages",_p10,_p11,docFile]));
-         return {local: local,network: network};
+         var local = $Path.resolve(_U.list(["elm-stuff","packages",_p9,_p10,docFile]));
+         var network = $Url.join(_U.list(["http://package.elm-lang.org","packages",_p9,_p10,docFile]));
+         return {local: local,network: network,name: _p9};
       };
       var deps = A2($Json$Decode.decodeString,$Json$Decode.keyValuePairs($Json$Decode.string),json);
-      var _p12 = deps;
-      if (_p12.ctor === "Ok") {
-            return $Result.Ok(A2($List.map,buildDocPath,_p12._0));
+      var _p11 = deps;
+      if (_p11.ctor === "Ok") {
+            return $Result.Ok(A2($List.map,buildDocPath,_p11._0));
          } else {
             return $Result.Err("Could not decode the dependencies file.");
          }
@@ -9210,17 +9210,17 @@ Elm.Main.make = function (_elm) {
    var Search = F2(function (a,b) {    return {ctor: "Search",_0: a,_1: b};});
    var Help = {ctor: "Help"};
    var parsedArgs = function () {
-      var _p13 = $Process.args;
+      var _p12 = $Process.args;
       _v2_1: do {
          _v2_0: do {
-            if (_p13.ctor === "::") {
-                  if (_p13._1.ctor === "::") {
-                        switch (_p13._0)
+            if (_p12.ctor === "::") {
+                  if (_p12._1.ctor === "::") {
+                        switch (_p12._0)
                         {case "-h": break _v2_0;
                            case "--help": break _v2_1;
-                           default: return A2(Search,_p13._0,_p13._1._0);}
+                           default: return A2(Search,_p12._0,_p12._1._0);}
                      } else {
-                        switch (_p13._0)
+                        switch (_p12._0)
                         {case "-h": break _v2_0;
                            case "--help": break _v2_1;
                            default: return Warn("You did not supply a query.");}
@@ -9235,14 +9235,14 @@ Elm.Main.make = function (_elm) {
    }();
    var usage = "elm-oracle 1.1.0\n\nUsage: elm-oracle FILE query\n  Query for information about a token in an Elm file.\n\nAvailable options:\n  -h,--help                    Show this help text.";
    var main = Elm.Native.Task.make(_elm).perform(function () {
-      var _p14 = parsedArgs;
-      switch (_p14.ctor)
+      var _p13 = parsedArgs;
+      switch (_p13.ctor)
       {case "Help": return $Console.log(usage);
-         case "Warn": return emitError(_p14._0);
+         case "Warn": return emitError(_p13._0);
          default: return A2(tryCatch,
            emitError,
            A2($Task.andThen,
-           loadSource(_p14._0),
+           loadSource(_p13._0),
            function (source) {
               return A2($Task.andThen,
               loadDeps,
@@ -9252,8 +9252,8 @@ Elm.Main.make = function (_elm) {
                  function (docPaths) {
                     return A2($Task.andThen,
                     downloadDocs(docPaths),
-                    function (_p15) {
-                       return A2($Task.andThen,loadDocs(docPaths),function (docs) {    return $Console.log(A3($Oracle.search,_p14._1,source,docs));});
+                    function (_p14) {
+                       return A2($Task.andThen,loadDocs(docPaths),function (docs) {    return $Console.log(A3($Oracle.search,_p13._1,source,docs));});
                     });
                  });
               });
