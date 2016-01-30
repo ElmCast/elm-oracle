@@ -30,6 +30,7 @@ defaultImports : Dict.Dict String Import
 defaultImports =
   Dict.fromList
     [ "Basics" => Every
+    , "Debug" => None
     , "List" => Some (Set.fromList ["List", "::"])
     , "Maybe" => Some (Set.singleton "Maybe")
     , "Result" => Some (Set.singleton "Result")

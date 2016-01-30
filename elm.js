@@ -8086,6 +8086,7 @@ Elm.Import.make = function (_elm) {
    var RawImport = F3(function (a,b,c) {    return {name: a,alias: b,exposed: c};});
    _op["=>"] = F2(function (name,exposed) {    return {ctor: "_Tuple2",_0: name,_1: A2(Import,$Maybe.Nothing,exposed)};});
    var defaultImports = $Dict.fromList(_U.list([A2(_op["=>"],"Basics",Every)
+                                               ,A2(_op["=>"],"Debug",None)
                                                ,A2(_op["=>"],"List",Some($Set.fromList(_U.list(["List","::"]))))
                                                ,A2(_op["=>"],"Maybe",Some($Set.singleton("Maybe")))
                                                ,A2(_op["=>"],"Result",Some($Set.singleton("Result")))
