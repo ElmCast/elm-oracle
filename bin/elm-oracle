@@ -70,7 +70,7 @@ function loadFile(filename) {
     try {
         file = fs.readFileSync(filename, 'utf8');
     } catch (err) {
-        console.log([{error:error}]);
+        console.log([{error:err.message}]);
         process.exit(1);
     }
 
