@@ -1,6 +1,6 @@
 {
   "name": "elm-oracle",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "Query for information about values in elm source files.",
   "engines": {
     "node": ">=0.12.0"

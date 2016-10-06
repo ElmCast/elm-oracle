@@ -1,3 +1,0 @@
-[submodule "elm-node"]
-	path = elm-node
-	url = git@github.com:ElmCast/elm-node.git
