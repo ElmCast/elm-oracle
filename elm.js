@@ -7737,7 +7737,7 @@ var _user$project$Exposed$parse = function (source) {
 	}
 };
 
-var _user$project$Import$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?');
+var _user$project$Import$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)))\\s*\\))?');
 var _user$project$Import$Import = F3(
 	function (a, b, c) {
 		return {name: a, alias: b, exposed: c};
@@ -7811,18 +7811,26 @@ var _user$project$Import$database = function (imports) {
 var _user$project$Import$parse = function (source) {
 	var process = function (match) {
 		var _p0 = match;
-		if ((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '[]')) {
+		if (((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '::')) && (_p0._1._1._1._1.ctor === '[]')) {
 			return A3(
 				_user$project$Import$Import,
 				A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
 				_p0._1._0,
-				_user$project$Exposed$parse(_p0._1._1._0));
+				_user$project$Exposed$parse(
+					A3(
+						_elm_lang$core$Maybe$map2,
+						F2(
+							function (x, y) {
+								return A2(_elm_lang$core$Basics_ops['++'], x, y);
+							}),
+						_p0._1._1._0,
+						_p0._1._1._1._0)));
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Import',
 				{
 					start: {line: 68, column: 13},
-					end: {line: 73, column: 81}
+					end: {line: 76, column: 81}
 				},
 				_p0)('Shouldn\'t have gotten here processing imports.');
 		}

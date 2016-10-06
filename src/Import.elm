@@ -53,7 +53,7 @@ database imports =
 
 pattern : Regex
 pattern =
-    regex "import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?"
+    regex "import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)))\\s*\\))?"
 
 
 {-| Parse.
@@ -66,8 +66,11 @@ parse source =
 
         process match =
             case match of
-                name :: alias :: exposes :: [] ->
-                    Import (Maybe.withDefault "" name) alias (Exposed.parse exposes)
+                name :: alias :: exposes :: exposes' :: [] ->
+                    Import
+                        (Maybe.withDefault "" name)
+                        alias
+                        (Exposed.parse (Maybe.map2 (++) exposes exposes'))
 
                 _ ->
                     Debug.crash "Shouldn't have gotten here processing imports."
