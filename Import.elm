@@ -1,8 +1,8 @@
-module Imports exposing (Import, parse)
+module Import exposing (Import, database, parse)
 
 {-| Parser for imports.
 
-@docs Import, parse
+@docs Import, databse, parse
 
 -}
 
@@ -16,23 +16,39 @@ import Exposed exposing (Exposed(..))
 {-| Import
 -}
 type alias Import =
-    { alias : Maybe String
+    { name : String
+    , alias : Maybe String
     , exposed : Exposed
     }
 
 
 defaultImports : Dict String Import
 defaultImports =
-    Dict.fromList
-        [ ( "Basics", Import Nothing Every )
-        , ( "Debug", Import Nothing None )
-        , ( "List", Import Nothing <| Some (Set.fromList [ "List", "::" ]) )
-        , ( "Maybe", Import Nothing <| Some (Set.fromList [ "Maybe", "Just", "Nothing" ]) )
-        , ( "Result", Import Nothing <| Some (Set.fromList [ "Result", "Ok", "Err" ]) )
-        , ( "Platform", Import Nothing <| Some (Set.singleton "Program") )
-        , ( "Platform.Cmd", Import Nothing <| Some (Set.fromList [ "Cmd", "!" ]) )
-        , ( "Platform.Sub", Import Nothing <| Some (Set.singleton "Sub") )
-        ]
+    let
+        build name exposed =
+            ( name, Import name Nothing exposed )
+    in
+        Dict.fromList
+            [ build "Basics" Every
+            , build "Debug" None
+            , build "List" <| Some (Set.fromList [ "List", "::" ])
+            , build "Maybe" <| Some (Set.fromList [ "Maybe", "Just", "Nothing" ])
+            , build "Result" <| Some (Set.fromList [ "Result", "Ok", "Err" ])
+            , build "Platform" <| Some (Set.singleton "Program")
+            , build "Platform.Cmd" <| Some (Set.fromList [ "Cmd", "!" ])
+            , build "Platform.Sub" <| Some (Set.singleton "Sub")
+            ]
+
+
+{-| Database.
+-}
+database : List Import -> Dict String Import
+database imports =
+    let
+        imports' =
+            List.map (\import' -> ( import'.name, import' )) imports
+    in
+        Dict.union (Dict.fromList imports') defaultImports
 
 
 pattern : Regex
@@ -42,7 +58,7 @@ pattern =
 
 {-| Parse.
 -}
-parse : String -> Dict String Import
+parse : String -> List Import
 parse source =
     let
         matches =
@@ -51,12 +67,9 @@ parse source =
         process match =
             case match of
                 name :: alias :: exposes :: [] ->
-                    ( Maybe.withDefault "" name, Import alias (Exposed.parse exposes) )
+                    Import (Maybe.withDefault "" name) alias (Exposed.parse exposes)
 
                 _ ->
                     Debug.crash "Shouldn't have gotten here processing imports."
-
-        imports =
-            List.map process matches
     in
-        Dict.union (Dict.fromList imports) defaultImports
+        List.map process matches

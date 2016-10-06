@@ -7737,105 +7737,92 @@ var _user$project$Exposed$parse = function (source) {
 	}
 };
 
-var _user$project$Imports$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?');
-var _user$project$Imports$Import = F2(
-	function (a, b) {
-		return {alias: a, exposed: b};
+var _user$project$Import$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?');
+var _user$project$Import$Import = F3(
+	function (a, b, c) {
+		return {name: a, alias: b, exposed: c};
 	});
-var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
-	_elm_lang$core$Native_List.fromArray(
-		[
-			{
-			ctor: '_Tuple2',
-			_0: 'Basics',
-			_1: A2(_user$project$Imports$Import, _elm_lang$core$Maybe$Nothing, _user$project$Exposed$Every)
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'Debug',
-			_1: A2(_user$project$Imports$Import, _elm_lang$core$Maybe$Nothing, _user$project$Exposed$None)
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'List',
-			_1: A2(
-				_user$project$Imports$Import,
-				_elm_lang$core$Maybe$Nothing,
+var _user$project$Import$defaultImports = function () {
+	var build = F2(
+		function (name, exposed) {
+			return {
+				ctor: '_Tuple2',
+				_0: name,
+				_1: A3(_user$project$Import$Import, name, _elm_lang$core$Maybe$Nothing, exposed)
+			};
+		});
+	return _elm_lang$core$Dict$fromList(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(build, 'Basics', _user$project$Exposed$Every),
+				A2(build, 'Debug', _user$project$Exposed$None),
+				A2(
+				build,
+				'List',
 				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
-							['List', '::']))))
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'Maybe',
-			_1: A2(
-				_user$project$Imports$Import,
-				_elm_lang$core$Maybe$Nothing,
+							['List', '::'])))),
+				A2(
+				build,
+				'Maybe',
 				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
-							['Maybe', 'Just', 'Nothing']))))
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'Result',
-			_1: A2(
-				_user$project$Imports$Import,
-				_elm_lang$core$Maybe$Nothing,
+							['Maybe', 'Just', 'Nothing'])))),
+				A2(
+				build,
+				'Result',
 				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
-							['Result', 'Ok', 'Err']))))
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'Platform',
-			_1: A2(
-				_user$project$Imports$Import,
-				_elm_lang$core$Maybe$Nothing,
+							['Result', 'Ok', 'Err'])))),
+				A2(
+				build,
+				'Platform',
 				_user$project$Exposed$Some(
-					_elm_lang$core$Set$singleton('Program')))
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'Platform.Cmd',
-			_1: A2(
-				_user$project$Imports$Import,
-				_elm_lang$core$Maybe$Nothing,
+					_elm_lang$core$Set$singleton('Program'))),
+				A2(
+				build,
+				'Platform.Cmd',
 				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
-							['Cmd', '!']))))
-		},
-			{
-			ctor: '_Tuple2',
-			_0: 'Platform.Sub',
-			_1: A2(
-				_user$project$Imports$Import,
-				_elm_lang$core$Maybe$Nothing,
+							['Cmd', '!'])))),
+				A2(
+				build,
+				'Platform.Sub',
 				_user$project$Exposed$Some(
 					_elm_lang$core$Set$singleton('Sub')))
-		}
-		]));
-var _user$project$Imports$parse = function (source) {
+			]));
+}();
+var _user$project$Import$database = function (imports) {
+	var imports$ = A2(
+		_elm_lang$core$List$map,
+		function (import$) {
+			return {ctor: '_Tuple2', _0: import$.name, _1: import$};
+		},
+		imports);
+	return A2(
+		_elm_lang$core$Dict$union,
+		_elm_lang$core$Dict$fromList(imports$),
+		_user$project$Import$defaultImports);
+};
+var _user$project$Import$parse = function (source) {
 	var process = function (match) {
 		var _p0 = match;
 		if ((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '[]')) {
-			return {
-				ctor: '_Tuple2',
-				_0: A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
-				_1: A2(
-					_user$project$Imports$Import,
-					_p0._1._0,
-					_user$project$Exposed$parse(_p0._1._1._0))
-			};
+			return A3(
+				_user$project$Import$Import,
+				A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
+				_p0._1._0,
+				_user$project$Exposed$parse(_p0._1._1._0));
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
-				'Imports',
+				'Import',
 				{
-					start: {line: 52, column: 13},
-					end: {line: 57, column: 81}
+					start: {line: 68, column: 13},
+					end: {line: 73, column: 81}
 				},
 				_p0)('Shouldn\'t have gotten here processing imports.');
 		}
@@ -7845,12 +7832,8 @@ var _user$project$Imports$parse = function (source) {
 		function (_) {
 			return _.submatches;
 		},
-		A3(_elm_lang$core$Regex$find, _elm_lang$core$Regex$All, _user$project$Imports$pattern, source));
-	var imports = A2(_elm_lang$core$List$map, process, matches);
-	return A2(
-		_elm_lang$core$Dict$union,
-		_elm_lang$core$Dict$fromList(imports),
-		_user$project$Imports$defaultImports);
+		A3(_elm_lang$core$Regex$find, _elm_lang$core$Regex$All, _user$project$Import$pattern, source));
+	return A2(_elm_lang$core$List$map, process, matches);
 };
 
 var _user$project$Module$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
@@ -7915,12 +7898,14 @@ var _user$project$Main$Model = F3(
 		return {query: a, imports: b, modules: c};
 	});
 var _user$project$Main$init = function (flags) {
+	var imports = _user$project$Import$database(
+		_user$project$Import$parse(flags.file));
 	return {
 		ctor: '_Tuple2',
 		_0: A3(
 			_user$project$Main$Model,
 			flags.query,
-			_user$project$Imports$parse(flags.file),
+			imports,
 			_elm_lang$core$Native_List.fromArray(
 				[])),
 		_1: _elm_lang$core$Platform_Cmd$none

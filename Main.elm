@@ -3,7 +3,7 @@ port module Main exposing (..)
 import Dict exposing (Dict)
 import Html.App
 import Html
-import Imports exposing (Import)
+import Import exposing (Import)
 import Module
 
 
@@ -35,7 +35,11 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags.query (Imports.parse flags.file) [], Cmd.none )
+    let
+        imports =
+            Import.database (Import.parse flags.file)
+    in
+        ( Model flags.query imports [], Cmd.none )
 
 
 
