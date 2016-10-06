@@ -10,7 +10,7 @@ import Regex exposing (Regex, find, HowMany(..), Match, regex)
 import Set
 import String
 import Dict exposing (Dict)
-import Exposed exposing (Exposed(..))
+import Export exposing (Export(..))
 
 
 {-| Import
@@ -18,25 +18,25 @@ import Exposed exposing (Exposed(..))
 type alias Import =
     { name : String
     , alias : Maybe String
-    , exposed : Exposed
+    , exports : Export
     }
 
 
 defaultImports : Dict String Import
 defaultImports =
     let
-        build name exposed =
-            ( name, Import name Nothing exposed )
+        build name exports =
+            ( name, Import name Nothing exports )
     in
         Dict.fromList
-            [ build "Basics" Every
-            , build "Debug" None
-            , build "List" <| Some (Set.fromList [ "List", "::" ])
-            , build "Maybe" <| Some (Set.fromList [ "Maybe", "Just", "Nothing" ])
-            , build "Result" <| Some (Set.fromList [ "Result", "Ok", "Err" ])
-            , build "Platform" <| Some (Set.singleton "Program")
-            , build "Platform.Cmd" <| Some (Set.fromList [ "Cmd", "!" ])
-            , build "Platform.Sub" <| Some (Set.singleton "Sub")
+            [ build "Basics" AllExport
+            , build "Debug" NoneExport
+            , build "List" (Export.parse "List, (::)")
+            , build "Maybe" (Export.parse "Maybe(Just, Nothing)")
+            , build "Result" (Export.parse "Result(Ok, Err)")
+            , build "Platform" (Export.parse "Program")
+            , build "Platform.Cmd" (Export.parse "Cmd, (!)")
+            , build "Platform.Sub" (Export.parse "Sub")
             ]
 
 
@@ -53,7 +53,7 @@ database imports =
 
 pattern : Regex
 pattern =
-    regex "import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)))\\s*\\))?"
+    regex "import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\)|\\w+\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)|\\w+\\(.+\\)))\\s*\\))?"
 
 
 {-| Parse.
@@ -66,11 +66,11 @@ parse source =
 
         process match =
             case match of
-                name :: alias :: exposes :: exposes' :: [] ->
+                name :: alias :: exports :: exports' :: [] ->
                     Import
                         (Maybe.withDefault "" name)
                         alias
-                        (Exposed.parse (Maybe.map2 (++) exposes exposes'))
+                        (Export.parse (Maybe.withDefault "" (Maybe.map2 (++) exports exports')))
 
                 _ ->
                     Debug.crash "Shouldn't have gotten here processing imports."

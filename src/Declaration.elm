@@ -8,7 +8,7 @@ module Declaration exposing (Declaration, parse)
 
 import List
 import Regex exposing (Regex, find, HowMany(..), Match, regex)
-import Exposed exposing (Exposed(..))
+import Export exposing (Export(..))
 import Import exposing (Import)
 
 
@@ -16,14 +16,15 @@ import Import exposing (Import)
 -}
 type alias Declaration =
     { name : String
-    , exposed : Exposed
+    , exports : Export
     , comment : String
     }
 
 
 pattern : Regex
 pattern =
-    regex "^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?"
+    --regex "^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?"
+    regex "^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\)|\\w+\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)|\\w+\\(.+\\)))\\s*\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?"
 
 
 {-| Parse.
@@ -36,9 +37,9 @@ parse source =
 
         process match =
             case match of
-                name :: exposes :: comment :: [] ->
+                name :: exports :: exports' :: comment :: [] ->
                     ( Maybe.withDefault "" name
-                    , Exposed.parse exposes
+                    , Export.parse (Maybe.withDefault "" (Maybe.map2 (++) exports exports'))
                     , Maybe.withDefault "" comment
                     )
 
@@ -46,8 +47,8 @@ parse source =
                     Debug.crash "Shouldn't have gotten here processing a module."
     in
         case List.head (List.map process matches) of
-            Just ( name, exposed, comment ) ->
-                Declaration name exposed comment
+            Just ( name, exports, comment ) ->
+                Declaration name exports comment
 
             Nothing ->
-                Declaration "" None ""
+                Declaration "" NoneExport ""

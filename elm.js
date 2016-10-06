@@ -7710,13 +7710,9 @@ var _elm_lang$html$Html_App$beginnerProgram = function (_p1) {
 };
 var _elm_lang$html$Html_App$map = _elm_lang$virtual_dom$VirtualDom$map;
 
-var _user$project$Exposed$Every = {ctor: 'Every'};
-var _user$project$Exposed$Some = function (a) {
-	return {ctor: 'Some', _0: a};
-};
-var _user$project$Exposed$None = {ctor: 'None'};
-var _user$project$Exposed$parse = function (source) {
-	var _p1 = A2(
+var _user$project$Export$pattern = _elm_lang$core$Regex$regex('(?:(\\w+)(?:\\(([^()]+)\\))?|\\(([^()]+)\\))');
+var _user$project$Export$split = function (s) {
+	return A2(
 		_elm_lang$core$Maybe$map,
 		function (_p0) {
 			return A2(
@@ -7724,76 +7720,140 @@ var _user$project$Exposed$parse = function (source) {
 				_elm_lang$core$String$trim,
 				A2(_elm_lang$core$String$split, ',', _p0));
 		},
-		source);
-	if (_p1.ctor === 'Nothing') {
-		return _user$project$Exposed$None;
+		s);
+};
+var _user$project$Export$isUpcase = function (s) {
+	var first = A2(_elm_lang$core$String$left, 1, s);
+	return _elm_lang$core$Native_Utils.eq(
+		first,
+		_elm_lang$core$String$toUpper(first));
+};
+var _user$project$Export$SomeCase = function (a) {
+	return {ctor: 'SomeCase', _0: a};
+};
+var _user$project$Export$NoneCase = {ctor: 'NoneCase'};
+var _user$project$Export$AllCase = {ctor: 'AllCase'};
+var _user$project$Export$toCase = function (cases) {
+	var _p1 = cases;
+	if (_p1.ctor === '[]') {
+		return _user$project$Export$NoneCase;
 	} else {
-		if (((_p1._0.ctor === '::') && (_p1._0._0 === '..')) && (_p1._0._1.ctor === '[]')) {
-			return _user$project$Exposed$Every;
+		if ((_p1._0 === '..') && (_p1._1.ctor === '[]')) {
+			return _user$project$Export$AllCase;
 		} else {
-			return _user$project$Exposed$Some(
-				_elm_lang$core$Set$fromList(_p1._0));
+			return _user$project$Export$SomeCase(_p1);
+		}
+	}
+};
+var _user$project$Export$TypeExport = F2(
+	function (a, b) {
+		return {ctor: 'TypeExport', _0: a, _1: b};
+	});
+var _user$project$Export$FunctionExport = function (a) {
+	return {ctor: 'FunctionExport', _0: a};
+};
+var _user$project$Export$SubsetExport = function (a) {
+	return {ctor: 'SubsetExport', _0: a};
+};
+var _user$project$Export$NoneExport = {ctor: 'NoneExport'};
+var _user$project$Export$AllExport = {ctor: 'AllExport'};
+var _user$project$Export$parse = function (source) {
+	if (_elm_lang$core$Native_Utils.eq(source, '')) {
+		return _user$project$Export$NoneExport;
+	} else {
+		if (_elm_lang$core$Native_Utils.eq(source, '..')) {
+			return _user$project$Export$AllExport;
+		} else {
+			var process = function (exports) {
+				var _p2 = exports;
+				if ((((_p2.ctor === '::') && (_p2._1.ctor === '::')) && (_p2._1._1.ctor === '::')) && (_p2._1._1._1.ctor === '[]')) {
+					var _p4 = _p2._1._1._0;
+					var binop$ = A2(_elm_lang$core$Maybe$map, _user$project$Export$FunctionExport, _p4);
+					var types$ = A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_user$project$Export$split(_p2._1._0));
+					var name$ = A2(_elm_lang$core$Maybe$withDefault, '', _p2._0);
+					var _p3 = _p4;
+					if (_p3.ctor === 'Just') {
+						return _user$project$Export$FunctionExport(_p3._0);
+					} else {
+						return _user$project$Export$isUpcase(name$) ? A2(
+							_user$project$Export$TypeExport,
+							name$,
+							_user$project$Export$toCase(types$)) : _user$project$Export$FunctionExport(name$);
+					}
+				} else {
+					return _elm_lang$core$Native_Utils.crashCase(
+						'Export',
+						{
+							start: {line: 78, column: 17},
+							end: {line: 101, column: 85}
+						},
+						_p2)('Shouldn\'t have gotten here processing exports.');
+				}
+			};
+			var match = function (source$) {
+				return A2(
+					_elm_lang$core$List$map,
+					function (_) {
+						return _.submatches;
+					},
+					A3(_elm_lang$core$Regex$find, _elm_lang$core$Regex$All, _user$project$Export$pattern, source$));
+			};
+			return _user$project$Export$SubsetExport(
+				A2(
+					_elm_lang$core$List$map,
+					process,
+					match(source)));
 		}
 	}
 };
 
-var _user$project$Import$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)))\\s*\\))?');
+var _user$project$Import$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s*\\(((?:\\s*(?:\\w+|\\(.+\\)|\\w+\\(.+\\))\\s*,)*)\\s*((?:\\.\\.|\\w+|\\(.+\\)|\\w+\\(.+\\)))\\s*\\))?');
 var _user$project$Import$Import = F3(
 	function (a, b, c) {
-		return {name: a, alias: b, exposed: c};
+		return {name: a, alias: b, exports: c};
 	});
 var _user$project$Import$defaultImports = function () {
 	var build = F2(
-		function (name, exposed) {
+		function (name, exports) {
 			return {
 				ctor: '_Tuple2',
 				_0: name,
-				_1: A3(_user$project$Import$Import, name, _elm_lang$core$Maybe$Nothing, exposed)
+				_1: A3(_user$project$Import$Import, name, _elm_lang$core$Maybe$Nothing, exports)
 			};
 		});
 	return _elm_lang$core$Dict$fromList(
 		_elm_lang$core$Native_List.fromArray(
 			[
-				A2(build, 'Basics', _user$project$Exposed$Every),
-				A2(build, 'Debug', _user$project$Exposed$None),
+				A2(build, 'Basics', _user$project$Export$AllExport),
+				A2(build, 'Debug', _user$project$Export$NoneExport),
 				A2(
 				build,
 				'List',
-				_user$project$Exposed$Some(
-					_elm_lang$core$Set$fromList(
-						_elm_lang$core$Native_List.fromArray(
-							['List', '::'])))),
+				_user$project$Export$parse('List, (::)')),
 				A2(
 				build,
 				'Maybe',
-				_user$project$Exposed$Some(
-					_elm_lang$core$Set$fromList(
-						_elm_lang$core$Native_List.fromArray(
-							['Maybe', 'Just', 'Nothing'])))),
+				_user$project$Export$parse('Maybe(Just, Nothing)')),
 				A2(
 				build,
 				'Result',
-				_user$project$Exposed$Some(
-					_elm_lang$core$Set$fromList(
-						_elm_lang$core$Native_List.fromArray(
-							['Result', 'Ok', 'Err'])))),
+				_user$project$Export$parse('Result(Ok, Err)')),
 				A2(
 				build,
 				'Platform',
-				_user$project$Exposed$Some(
-					_elm_lang$core$Set$singleton('Program'))),
+				_user$project$Export$parse('Program')),
 				A2(
 				build,
 				'Platform.Cmd',
-				_user$project$Exposed$Some(
-					_elm_lang$core$Set$fromList(
-						_elm_lang$core$Native_List.fromArray(
-							['Cmd', '!'])))),
+				_user$project$Export$parse('Cmd, (!)')),
 				A2(
 				build,
 				'Platform.Sub',
-				_user$project$Exposed$Some(
-					_elm_lang$core$Set$singleton('Sub')))
+				_user$project$Export$parse('Sub'))
 			]));
 }();
 var _user$project$Import$database = function (imports) {
@@ -7816,15 +7876,18 @@ var _user$project$Import$parse = function (source) {
 				_user$project$Import$Import,
 				A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
 				_p0._1._0,
-				_user$project$Exposed$parse(
-					A3(
-						_elm_lang$core$Maybe$map2,
-						F2(
-							function (x, y) {
-								return A2(_elm_lang$core$Basics_ops['++'], x, y);
-							}),
-						_p0._1._1._0,
-						_p0._1._1._1._0)));
+				_user$project$Export$parse(
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						'',
+						A3(
+							_elm_lang$core$Maybe$map2,
+							F2(
+								function (x, y) {
+									return A2(_elm_lang$core$Basics_ops['++'], x, y);
+								}),
+							_p0._1._1._0,
+							_p0._1._1._1._0))));
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Import',
@@ -7847,7 +7910,7 @@ var _user$project$Import$parse = function (source) {
 var _user$project$Declaration$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
 var _user$project$Declaration$Declaration = F3(
 	function (a, b, c) {
-		return {name: a, exposed: b, comment: c};
+		return {name: a, exports: b, comment: c};
 	});
 var _user$project$Declaration$parse = function (source) {
 	var process = function (match) {
@@ -7856,7 +7919,8 @@ var _user$project$Declaration$parse = function (source) {
 			return {
 				ctor: '_Tuple3',
 				_0: A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
-				_1: _user$project$Exposed$parse(_p0._1._0),
+				_1: _user$project$Export$parse(
+					A2(_elm_lang$core$Maybe$withDefault, '', _p0._1._0)),
 				_2: A2(_elm_lang$core$Maybe$withDefault, '', _p0._1._1._0)
 			};
 		} else {
@@ -7884,7 +7948,7 @@ var _user$project$Declaration$parse = function (source) {
 	if (_p2.ctor === 'Just') {
 		return A3(_user$project$Declaration$Declaration, _p2._0._0, _p2._0._1, _p2._0._2);
 	} else {
-		return A3(_user$project$Declaration$Declaration, '', _user$project$Exposed$None, '');
+		return A3(_user$project$Declaration$Declaration, '', _user$project$Export$NoneExport, '');
 	}
 };
 
