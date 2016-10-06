@@ -1,19 +1,24 @@
-module Imports exposing (parse, Import, Exposed(..))
+module Imports exposing (Import, parse)
+
+{-| Parser for imports.
+
+@docs Import, parse
+
+-}
 
 import Regex exposing (Regex, find, HowMany(..), Match, regex)
 import Set
 import String
 import Dict exposing (Dict)
+import Exposed exposing (Exposed(..))
 
 
-type Exposed
-    = None
-    | Some (Set.Set String)
-    | Every
-
-
+{-| Import
+-}
 type alias Import =
-    { alias : Maybe String, exposed : Exposed }
+    { alias : Maybe String
+    , exposed : Exposed
+    }
 
 
 defaultImports : Dict String Import
@@ -35,27 +40,18 @@ pattern =
     regex "import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?"
 
 
+{-| Parse.
+-}
 parse : String -> Dict String Import
 parse source =
     let
         matches =
             List.map .submatches (find All pattern source)
 
-        exposes e =
-            case Maybe.map ((List.map String.trim) << String.split ",") e of
-                Nothing ->
-                    None
-
-                Just [ ".." ] ->
-                    Every
-
-                Just vars ->
-                    Some (Set.fromList vars)
-
         process match =
             case match of
-                name :: alias :: exposed :: [] ->
-                    ( Maybe.withDefault "" name, Import alias (exposes exposed) )
+                name :: alias :: exposes :: [] ->
+                    ( Maybe.withDefault "" name, Import alias (Exposed.parse exposes) )
 
                 _ ->
                     Debug.crash "Shouldn't have gotten here processing imports."

@@ -7710,28 +7710,50 @@ var _elm_lang$html$Html_App$beginnerProgram = function (_p1) {
 };
 var _elm_lang$html$Html_App$map = _elm_lang$virtual_dom$VirtualDom$map;
 
+var _user$project$Exposed$Every = {ctor: 'Every'};
+var _user$project$Exposed$Some = function (a) {
+	return {ctor: 'Some', _0: a};
+};
+var _user$project$Exposed$None = {ctor: 'None'};
+var _user$project$Exposed$parse = function (source) {
+	var _p1 = A2(
+		_elm_lang$core$Maybe$map,
+		function (_p0) {
+			return A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$String$trim,
+				A2(_elm_lang$core$String$split, ',', _p0));
+		},
+		source);
+	if (_p1.ctor === 'Nothing') {
+		return _user$project$Exposed$None;
+	} else {
+		if (((_p1._0.ctor === '::') && (_p1._0._0 === '..')) && (_p1._0._1.ctor === '[]')) {
+			return _user$project$Exposed$Every;
+		} else {
+			return _user$project$Exposed$Some(
+				_elm_lang$core$Set$fromList(_p1._0));
+		}
+	}
+};
+
 var _user$project$Imports$pattern = _elm_lang$core$Regex$regex('import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?');
 var _user$project$Imports$Import = F2(
 	function (a, b) {
 		return {alias: a, exposed: b};
 	});
-var _user$project$Imports$Every = {ctor: 'Every'};
-var _user$project$Imports$Some = function (a) {
-	return {ctor: 'Some', _0: a};
-};
-var _user$project$Imports$None = {ctor: 'None'};
 var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 	_elm_lang$core$Native_List.fromArray(
 		[
 			{
 			ctor: '_Tuple2',
 			_0: 'Basics',
-			_1: A2(_user$project$Imports$Import, _elm_lang$core$Maybe$Nothing, _user$project$Imports$Every)
+			_1: A2(_user$project$Imports$Import, _elm_lang$core$Maybe$Nothing, _user$project$Exposed$Every)
 		},
 			{
 			ctor: '_Tuple2',
 			_0: 'Debug',
-			_1: A2(_user$project$Imports$Import, _elm_lang$core$Maybe$Nothing, _user$project$Imports$None)
+			_1: A2(_user$project$Imports$Import, _elm_lang$core$Maybe$Nothing, _user$project$Exposed$None)
 		},
 			{
 			ctor: '_Tuple2',
@@ -7739,7 +7761,7 @@ var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 			_1: A2(
 				_user$project$Imports$Import,
 				_elm_lang$core$Maybe$Nothing,
-				_user$project$Imports$Some(
+				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
 							['List', '::']))))
@@ -7750,7 +7772,7 @@ var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 			_1: A2(
 				_user$project$Imports$Import,
 				_elm_lang$core$Maybe$Nothing,
-				_user$project$Imports$Some(
+				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
 							['Maybe', 'Just', 'Nothing']))))
@@ -7761,7 +7783,7 @@ var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 			_1: A2(
 				_user$project$Imports$Import,
 				_elm_lang$core$Maybe$Nothing,
-				_user$project$Imports$Some(
+				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
 							['Result', 'Ok', 'Err']))))
@@ -7772,7 +7794,7 @@ var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 			_1: A2(
 				_user$project$Imports$Import,
 				_elm_lang$core$Maybe$Nothing,
-				_user$project$Imports$Some(
+				_user$project$Exposed$Some(
 					_elm_lang$core$Set$singleton('Program')))
 		},
 			{
@@ -7781,7 +7803,7 @@ var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 			_1: A2(
 				_user$project$Imports$Import,
 				_elm_lang$core$Maybe$Nothing,
-				_user$project$Imports$Some(
+				_user$project$Exposed$Some(
 					_elm_lang$core$Set$fromList(
 						_elm_lang$core$Native_List.fromArray(
 							['Cmd', '!']))))
@@ -7792,51 +7814,30 @@ var _user$project$Imports$defaultImports = _elm_lang$core$Dict$fromList(
 			_1: A2(
 				_user$project$Imports$Import,
 				_elm_lang$core$Maybe$Nothing,
-				_user$project$Imports$Some(
+				_user$project$Exposed$Some(
 					_elm_lang$core$Set$singleton('Sub')))
 		}
 		]));
 var _user$project$Imports$parse = function (source) {
-	var exposes = function (e) {
-		var _p1 = A2(
-			_elm_lang$core$Maybe$map,
-			function (_p0) {
-				return A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$String$trim,
-					A2(_elm_lang$core$String$split, ',', _p0));
-			},
-			e);
-		if (_p1.ctor === 'Nothing') {
-			return _user$project$Imports$None;
-		} else {
-			if (((_p1._0.ctor === '::') && (_p1._0._0 === '..')) && (_p1._0._1.ctor === '[]')) {
-				return _user$project$Imports$Every;
-			} else {
-				return _user$project$Imports$Some(
-					_elm_lang$core$Set$fromList(_p1._0));
-			}
-		}
-	};
 	var process = function (match) {
-		var _p2 = match;
-		if ((((_p2.ctor === '::') && (_p2._1.ctor === '::')) && (_p2._1._1.ctor === '::')) && (_p2._1._1._1.ctor === '[]')) {
+		var _p0 = match;
+		if ((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '[]')) {
 			return {
 				ctor: '_Tuple2',
-				_0: A2(_elm_lang$core$Maybe$withDefault, '', _p2._0),
+				_0: A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
 				_1: A2(
 					_user$project$Imports$Import,
-					_p2._1._0,
-					exposes(_p2._1._1._0))
+					_p0._1._0,
+					_user$project$Exposed$parse(_p0._1._1._0))
 			};
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Imports',
 				{
-					start: {line: 54, column: 13},
-					end: {line: 59, column: 81}
+					start: {line: 52, column: 13},
+					end: {line: 57, column: 81}
 				},
-				_p2)('Shouldn\'t have gotten here processing imports.');
+				_p0)('Shouldn\'t have gotten here processing imports.');
 		}
 	};
 	var matches = A2(
@@ -7850,6 +7851,44 @@ var _user$project$Imports$parse = function (source) {
 		_elm_lang$core$Dict$union,
 		_elm_lang$core$Dict$fromList(imports),
 		_user$project$Imports$defaultImports);
+};
+
+var _user$project$Module$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+exposing\\s+\\((.+)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
+var _user$project$Module$Module = F3(
+	function (a, b, c) {
+		return {name: a, exposed: b, comment: c};
+	});
+var _user$project$Module$parse = function (source) {
+	var process = function (match) {
+		var _p0 = match;
+		if ((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '[]')) {
+			return A3(
+				_user$project$Module$Module,
+				A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
+				_user$project$Exposed$parse(_p0._1._0),
+				A2(_elm_lang$core$Maybe$withDefault, '', _p0._1._1._0));
+		} else {
+			return _elm_lang$core$Native_Utils.crashCase(
+				'Module',
+				{
+					start: {line: 37, column: 13},
+					end: {line: 45, column: 82}
+				},
+				_p0)('Shouldn\'t have gotten here processing a module.');
+		}
+	};
+	var matches = A2(
+		_elm_lang$core$List$map,
+		function (_) {
+			return _.submatches;
+		},
+		A3(
+			_elm_lang$core$Regex$find,
+			_elm_lang$core$Regex$AtMost(1),
+			_user$project$Module$pattern,
+			source));
+	var modules = A2(_elm_lang$core$List$map, process, matches);
+	return _elm_lang$core$List$head(modules);
 };
 
 var _user$project$Main$update = F2(

@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import Html.App
 import Html
 import Imports exposing (Import)
+import Module
 
 
 main =
