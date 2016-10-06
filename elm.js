@@ -7836,13 +7836,12 @@ var _user$project$Import$parse = function (source) {
 	return A2(_elm_lang$core$List$map, process, matches);
 };
 
-var _user$project$Module$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
-var _user$project$Module$Module = F4(
-	function (a, b, c, d) {
-		return {name: a, exposed: b, comment: c, imports: d};
+var _user$project$Declaration$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
+var _user$project$Declaration$Declaration = F3(
+	function (a, b, c) {
+		return {name: a, exposed: b, comment: c};
 	});
-var _user$project$Module$parse = function (source) {
-	var imports = _user$project$Import$parse(source);
+var _user$project$Declaration$parse = function (source) {
 	var process = function (match) {
 		var _p0 = match;
 		if ((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '[]')) {
@@ -7854,10 +7853,10 @@ var _user$project$Module$parse = function (source) {
 			};
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
-				'Module',
+				'Declaration',
 				{
-					start: {line: 39, column: 13},
-					end: {line: 47, column: 82}
+					start: {line: 38, column: 13},
+					end: {line: 46, column: 82}
 				},
 				_p0)('Shouldn\'t have gotten here processing a module.');
 		}
@@ -7870,15 +7869,26 @@ var _user$project$Module$parse = function (source) {
 		A3(
 			_elm_lang$core$Regex$find,
 			_elm_lang$core$Regex$AtMost(1),
-			_user$project$Module$pattern,
+			_user$project$Declaration$pattern,
 			source));
 	var _p2 = _elm_lang$core$List$head(
 		A2(_elm_lang$core$List$map, process, matches));
 	if (_p2.ctor === 'Just') {
-		return A4(_user$project$Module$Module, _p2._0._0, _p2._0._1, _p2._0._2, imports);
+		return A3(_user$project$Declaration$Declaration, _p2._0._0, _p2._0._1, _p2._0._2);
 	} else {
-		return A4(_user$project$Module$Module, '', _user$project$Exposed$None, '', imports);
+		return A3(_user$project$Declaration$Declaration, '', _user$project$Exposed$None, '');
 	}
+};
+
+var _user$project$Module$Module = F2(
+	function (a, b) {
+		return {delcaration: a, imports: b};
+	});
+var _user$project$Module$parse = function (source) {
+	return A2(
+		_user$project$Module$Module,
+		_user$project$Declaration$parse(source),
+		_user$project$Import$parse(source));
 };
 
 var _user$project$Main$update = F2(
