@@ -30,10 +30,12 @@ defaultImports =
         ]
 
 
+pattern : Regex
 pattern =
     regex "import\\s+([\\w+\\.?]+)(?:\\s+as\\s+(\\w+))?(?:\\s+exposing\\s+\\((.+)\\))?"
 
 
+parse : String -> Dict String Import
 parse source =
     let
         matches =
