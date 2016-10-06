@@ -9,6 +9,7 @@ module Module exposing (Module, parse)
 import List
 import Regex exposing (Regex, find, HowMany(..), Match, regex)
 import Exposed exposing (Exposed(..))
+import Import exposing (Import)
 
 
 {-| Module
@@ -17,6 +18,7 @@ type alias Module =
     { name : String
     , exposed : Exposed
     , comment : String
+    , imports : List Import
     }
 
 
@@ -27,7 +29,7 @@ pattern =
 
 {-| Parse.
 -}
-parse : String -> Maybe Module
+parse : String -> Module
 parse source =
     let
         matches =
@@ -36,15 +38,20 @@ parse source =
         process match =
             case match of
                 name :: exposes :: comment :: [] ->
-                    Module
-                        (Maybe.withDefault "" name)
-                        (Exposed.parse exposes)
-                        (Maybe.withDefault "" comment)
+                    ( Maybe.withDefault "" name
+                    , Exposed.parse exposes
+                    , Maybe.withDefault "" comment
+                    )
 
                 _ ->
                     Debug.crash "Shouldn't have gotten here processing a module."
 
-        modules =
-            List.map process matches
+        imports =
+            Import.parse source
     in
-        List.head modules
+        case List.head (List.map process matches) of
+            Just ( name, exposed, comment ) ->
+                Module name exposed comment imports
+
+            Nothing ->
+                Module "" None "" imports

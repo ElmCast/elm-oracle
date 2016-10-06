@@ -4,7 +4,7 @@ import Dict exposing (Dict)
 import Html.App
 import Html
 import Import exposing (Import)
-import Module
+import Module exposing (Module)
 
 
 main =
@@ -23,7 +23,7 @@ main =
 type alias Model =
     { query : String
     , imports : Dict String Import
-    , modules : List String
+    , modules : List Module
     }
 
 
@@ -57,7 +57,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Module source ->
-            ( { model | modules = source :: model.modules }, Cmd.none )
+            ( { model | modules = (Module.parse source) :: model.modules }, Cmd.none )
 
 
 

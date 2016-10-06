@@ -7837,25 +7837,27 @@ var _user$project$Import$parse = function (source) {
 };
 
 var _user$project$Module$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
-var _user$project$Module$Module = F3(
-	function (a, b, c) {
-		return {name: a, exposed: b, comment: c};
+var _user$project$Module$Module = F4(
+	function (a, b, c, d) {
+		return {name: a, exposed: b, comment: c, imports: d};
 	});
 var _user$project$Module$parse = function (source) {
+	var imports = _user$project$Import$parse(source);
 	var process = function (match) {
 		var _p0 = match;
 		if ((((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) && (_p0._1._1._1.ctor === '[]')) {
-			return A3(
-				_user$project$Module$Module,
-				A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
-				_user$project$Exposed$parse(_p0._1._0),
-				A2(_elm_lang$core$Maybe$withDefault, '', _p0._1._1._0));
+			return {
+				ctor: '_Tuple3',
+				_0: A2(_elm_lang$core$Maybe$withDefault, '', _p0._0),
+				_1: _user$project$Exposed$parse(_p0._1._0),
+				_2: A2(_elm_lang$core$Maybe$withDefault, '', _p0._1._1._0)
+			};
 		} else {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Module',
 				{
-					start: {line: 37, column: 13},
-					end: {line: 45, column: 82}
+					start: {line: 39, column: 13},
+					end: {line: 47, column: 82}
 				},
 				_p0)('Shouldn\'t have gotten here processing a module.');
 		}
@@ -7870,8 +7872,13 @@ var _user$project$Module$parse = function (source) {
 			_elm_lang$core$Regex$AtMost(1),
 			_user$project$Module$pattern,
 			source));
-	var modules = A2(_elm_lang$core$List$map, process, matches);
-	return _elm_lang$core$List$head(modules);
+	var _p2 = _elm_lang$core$List$head(
+		A2(_elm_lang$core$List$map, process, matches));
+	if (_p2.ctor === 'Just') {
+		return A4(_user$project$Module$Module, _p2._0._0, _p2._0._1, _p2._0._2, imports);
+	} else {
+		return A4(_user$project$Module$Module, '', _user$project$Exposed$None, '', imports);
+	}
 };
 
 var _user$project$Main$update = F2(
@@ -7882,7 +7889,10 @@ var _user$project$Main$update = F2(
 			_0: _elm_lang$core$Native_Utils.update(
 				model,
 				{
-					modules: A2(_elm_lang$core$List_ops['::'], _p0._0, model.modules)
+					modules: A2(
+						_elm_lang$core$List_ops['::'],
+						_user$project$Module$parse(_p0._0),
+						model.modules)
 				}),
 			_1: _elm_lang$core$Platform_Cmd$none
 		};
