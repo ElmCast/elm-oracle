@@ -7853,7 +7853,7 @@ var _user$project$Imports$parse = function (source) {
 		_user$project$Imports$defaultImports);
 };
 
-var _user$project$Module$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+exposing\\s+\\((.+)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
+var _user$project$Module$pattern = _elm_lang$core$Regex$regex('^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?');
 var _user$project$Module$Module = F3(
 	function (a, b, c) {
 		return {name: a, exposed: b, comment: c};

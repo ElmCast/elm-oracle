@@ -22,7 +22,7 @@ type alias Module =
 
 pattern : Regex
 pattern =
-    regex "^(?:port\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+exposing\\s+\\((.+)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?"
+    regex "^(?:port\\s+|effect\\s+)?module\\s+([\\w+\\.?]+)(?:\\s+where\\s+{\\s+[\\s\\w=,]*})?(?:\\s+exposing\\s+\\(([\\s\\w,\\.]*)\\))?(?:\\s+{-\\|([\\s\\S]*?)-})?"
 
 
 {-| Parse.
