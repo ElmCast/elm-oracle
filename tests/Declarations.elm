@@ -1,4 +1,4 @@
-module Tests exposing (..)
+module Declarations exposing (..)
 
 import Test exposing (..)
 import Helper exposing (..)
