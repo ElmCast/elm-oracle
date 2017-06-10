@@ -51,3 +51,4 @@ If elm-oracle encounters errors, it will return a json array or json objects lik
 * Emacs: [elm-mode](https://github.com/jcollard/elm-mode)
 * Sublime: [Elm.tmLanguage](https://github.com/deadfoxygrandpa/Elm.tmLanguage)
 * LightTable: [elm-light](http://github.com/rundis/elm-light)
+* NeoVim: [deoplete-elm](https://github.com/pbogut/deoplete-elm)
